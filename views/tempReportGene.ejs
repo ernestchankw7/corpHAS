@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporary Report</title>
+</head>
+<body>
+    <h1>Temporary Report Page</h1>
+    <p>This is where the report will be generated and displayed.</p>
+
+    <button id="generate-report-btn">Generate Report</button>
+    <table id="employee-table" border="1" style="width:100%; margin-top: 20px; display: none;">
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Company</th>
+                <th>Package</th>
+            </tr>
+        </thead>
+        <tbody id="employee-list">
+        </tbody>
+    </table>
+
+    <button id="generate-pdf-btn" style="display:none; margin-top: 20px;">Generate PDF</button>
+
+    <script>
+        document.getElementById('generate-report-btn').addEventListener('click', async function () {
+            try {
+                const response = await fetch('/api/employees');
+                const employees = await response.json();
+
+                const employeeTable = document.getElementById('employee-table');
+                const employeeList = document.getElementById('employee-list');
+                employeeList.innerHTML = ''; // Clear existing list
+
+                employees.forEach(employee => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${employee.employee_id || 'N/A'}</td>
+                        <td>${employee.name || 'N/A'}</td>
+                        <td>${employee.email || 'N/A'}</td>
+                        <td>${employee.phone || 'N/A'}</td>
+                        <td>${employee.company || 'N/A'}</td>
+                        <td>${employee.package || 'N/A'}</td>
+                    `;
+                    employeeList.appendChild(row);
+                });
+
+                employeeTable.style.display = 'table';
+                document.getElementById('generate-pdf-btn').style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
+            }
+        });
+
+        document.getElementById('generate-pdf-btn').addEventListener('click', function () {
+            window.location.href = '/generate-pdf';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Details</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: 'Lora' !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: url('/LoginImage.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            min-height: 300px;
+            padding: 40px 40px;
+            margin-top: 60px;
+        }
+
+        h1 {
+            color: black;
+            margin-bottom: 20px;
+            font-size: 45px;
+        }
+
+        p {
+            font-size: 25px;
+            color: black;
+            margin: 10px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #005A9C;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 15px;
+            width: auto;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0072B2;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('navbar', { employeeID: employee.employee_id }) %>
+        <div class="container">
+            <h1>Welcome, <%= employee.name %>!</h1>
+            <p><strong>Employee ID:</strong>
+                <%= employee.employee_id %>
+            </p>
+            <p><strong>Email:</strong>
+                <%= employee.email %>
+            </p>
+            <p><strong>Phone:</strong>
+                <%= employee.phone %>
+            </p>
+            <p><strong>Company:</strong>
+                <%= employee.company %>
+            </p>
+            <p><strong>Package:</strong>
+                <%= employee.package %>
+            </p>
+
+            <!-- Conditional rendering for appointment details -->
+            <% if (typeof appointment !=='undefined' && appointment) { %>
+                <p><strong>Appointment Date:</strong>
+                    <%= appointment.date.toDateString() %>
+                </p>
+                <p><strong>Appointment Time:</strong>
+                    <%= appointment.time %>
+                </p>
+                <% } else { %>
+                    <h2>You have not booked an appointment yet.</h2>
+                    <% } %>
+
+                        <div class="button-container">
+                            <a href="/update-employee/<%= employee.employee_id %>" class="btn">Update Details</a>
+                            <% if (typeof appointment !=='undefined' && appointment) { %>
+                                <a href="/reschedule-appointment/<%= employee.employee_id %>" class="btn">Reschedule
+                                    Appointment</a>
+                                <% } else { %>
+                                    <a href="/booking-form/<%= employee.employee_id %>" class="btn">Book Appointment</a>
+                                    <% } %>
+                                        <a href="/" class="btn signout-btn" onclick="clearCartAndSignOut(event)">Sign
+                                            Out</a>
+                                        <!-- Temp Report Button** -->
+                                        <a href="/generate-report/<%= employee.employee_id %>" class="btn">Generate Report</a>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <a href="/survey/<%= employee.employee_id %>"
+                                style="color: #000000; font-size: 16px; text-decoration: underline;">
+                                Unsure on which test to choose? Take a survey.
+                            </a>
+                        </div>
+        </div>
+        <script>
+            function clearCartAndSignOut(event) {
+                event.preventDefault(); // Prevent the default link behavior
+
+                // Clear the cart from localStorage
+                localStorage.removeItem('cart');
+                localStorage.removeItem('recommendedGroups');
+
+                // Redirect to the sign-out route (or home page)
+                window.location.href = "/";
+            }
+        </script>
+</body>
+
+</html>

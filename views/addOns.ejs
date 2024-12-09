@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Items</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lora';
+            display: flex;
+            justify-content: center;
+            /* background-color: #f5f5f5; */
+            overflow-x: hidden;
+            margin-top: 80px;
+            background-color: #aad9d8;
+            /* background: url('/backgroundImg5.jpg') no-repeat center;
+            background-size: cover; 
+            background-attachment: fixed; */
+        }
+
+        /* Main container to hold the catalog grid and sidebar */
+        .main-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Catalog grid styling */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-right: 270px;
+        }
+
+        /* Catalog item styling */
+        .catalog-item {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .catalog-item .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+            /* Ensures buttons are aligned */
+        }
+
+
+        .catalog-item:hover {
+            transform: scale(1.05);
+        }
+
+        .catalog-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            /* Ensures content takes available space */
+        }
+
+        .content h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #000000;
+        }
+
+        .content p {
+            font-size: 1em;
+            margin-bottom: 15px;
+            color: #000000;
+        }
+
+        .content button {
+            font-family: 'Lora';
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #0072B2;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            /* position: sticky; */
+            top: 20px;
+            width: 250px;
+            background-color: rgba(255, 255, 255, 0);
+            /* Transparent white background */
+            border: 1px solid #000000;
+            /* Light gray border */
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            align-self: start;
+            margin-top: 80px;
+        }
+
+        .sidebar-price {
+            /* position: sticky; */
+            top: 20px;
+            width: 250px;
+            max-height: 400px;
+            background-color: rgba(255, 255, 255, 0);
+            /* Transparent white background */
+            border: 1px solid #000000;
+            /* Light gray border */
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            align-self: start;
+            overflow: hidden;
+        }
+
+        #selected-items {
+            max-height: 150px;
+            /* Limit height of selected items section */
+            overflow-y: auto;
+            /* Enable vertical scroll */
+            margin-top: 10px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .sidebar h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #000000;
+        }
+
+        .sidebar p {
+            font-size: 1em;
+            color: #000000;
+            margin-bottom: 10px;
+            /* white-space: nowrap; */
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            padding: 10px 20px;
+            background-color: #0072B2;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 768px) {
+            .catalog-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .catalog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Sidebar container to stack sidebars vertically */
+        .sidebar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            /* Space between sidebars */
+            /* position: sticky; */
+            position: fixed;
+            top: 20px;
+            /* Distance from top of the viewport */
+            right: 80px;
+            /* Adjust as needed to position it on the right */
+            width: 250px;
+        }
+
+        .price {
+            font-weight: bold;
+            /* Makes the price stand out */
+            font-size: 1.1em;
+            /* Slightly increases the font size */
+        }
+
+        .view-button {
+            margin-top: auto;
+            /* Pushes the button to the bottom of the content */
+            align-self: center;
+            padding: 10px 10px;
+            background-color: #0072B2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .add-button-container {
+            display: flex;
+            /* Use flexbox for alignment */
+            justify-content: space-between;
+            /* Spread the Add button and price apart */
+            align-items: center;
+            /* Vertically align the button and price */
+            /* margin-top: auto; */
+            /* Pushes it to the bottom of the content */
+            padding-top: 30px;
+            /* Adds some padding between content and Add section */
+        }
+
+        .proceed-button {
+            font-family: 'Lora';
+            background-color: #0072B2;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            align-self: center;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .remove-button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('navbar', { employeeID: employee.employee_id }) %>
+        <div class="main-container">
+            <!-- Catalog grid for items -->
+            <div class="catalog-grid">
+                <!-- Six catalog items in a 3x2 grid layout -->
+                <div class="catalog-item" data-item="1">
+                    <img src="/basicTest.jpg" alt="Item 1">
+                    <div class="content">
+                        <h3>Basic Test package</h3>
+                        <p>The tests included are free of charge.</p>
+                        <!-- <button onclick="openModal(1)">View Details</button> -->
+                        <button class="view-button" onclick="openModal(1)">View Details</button>
+                        <div class="add-button-container">
+                            <button class="add-button" id="add-button-1" onclick="addToCart(1)" disabled>Add</button>
+                            <span class="price">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="catalog-item" data-item="2">
+                    <img src="/KidneyFunction.jpg" alt="Item 2">
+                    <div class="content">
+                        <h3>Kidney function test</h3>
+                        <span id="recommended-kidney" class="recommended-tag"></span>
+                        <p>Evaluates kidney function</p>
+                        <button class="view-button" onclick="openModal(2)">View Details</button>
+                        <div class="add-button-container">
+                            <button class="add-button" id="add-button-2" onclick="addToCart(2)">Add</button>
+                            <span class="price">$99.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="catalog-item" data-item="3">
+                    <img src="/HIV.jpg" alt="Item 3">
+                    <div class="content">
+                        <h3>HIV test</h3>
+                        <span id="recommended-hiv" class="recommended-tag"></span>
+                        <p>Checks for HIV.</p>
+                        <button class="view-button" onclick="openModal(3)">View Details</button>
+                        <div class="add-button-container">
+                            <button class="add-button" id="add-button-3" onclick="addToCart(3)">Add</button>
+                            <span class="price">$79.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="catalog-item" data-item="4">
+                    <img src="/electro.jpg" alt="Item 4">
+                    <div class="content">
+                        <h3>Electrocardiogram</h3>
+                        <span id="recommended-electro" class="recommended-tag"></span>
+                        <p>Records heart's electrical activity</p>
+                        <button class="view-button" onclick="openModal(4)">View Details</button>
+                        <div class="add-button-container">
+                            <button class="add-button" id="add-button-4" onclick="addToCart(4)">Add</button>
+                            <span class="price">$190.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="catalog-item" data-item="5">
+                    <img src="/Lipid.png" alt="Item 5">
+                    <div class="content">
+                        <h3>Lipid test</h3>
+                        <span id="recommended-lipid" class="recommended-tag"></span>
+                        <p>Measures cholesterol levels</p>
+                        <button class="view-button" onclick="openModal(5)">View Details</button>
+                        <div class="add-button-container">
+                            <button class="add-button" id="add-button-5" onclick="addToCart(5)">Add</button>
+                            <span class="price">$45.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="catalog-item" data-item="6">
+                    <img src="/MRI.jpg" alt="Item 6">
+                    <div class="content">
+                        <h3>MRI Scan</h3>
+                        <span id="recommended-mri" class="recommended-tag"></span>
+                        <p>Detailed body images.</p>
+                        <button class="view-button" onclick="openModal(6)">View Details</button>
+                        <div class="add-button-container">
+                            <button class="add-button" id="add-button-6" onclick="addToCart(6)">Add</button>
+                            <span class="price">$280.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar for user information -->
+                <div class="sidebar-container">
+                    <!-- Sidebar for user information -->
+                    <div class="sidebar">
+                        <h3>Profile Information</h3>
+                        <p><strong>Name:</strong>
+                            <%= employee.name %>
+                        </p>
+                        <p><strong>Employee ID:</strong>
+                            <%= employee.employee_id %>
+                        </p>
+                        <p><strong>Email:</strong>
+                            <%= employee.email %>
+                        </p>
+                        <p><strong>Phone:</strong>
+                            <%= employee.phone %>
+                        </p>
+                        <p><strong>Company:</strong>
+                            <%= employee.company %>
+                        </p>
+                        <p><strong>Package:</strong>
+                            <%= employee.package %>
+                        </p>
+                    </div>
+
+                    <!-- Sidebar for price information -->
+                    <div class="sidebar-price" id="price-info">
+                        <h3>Price Information</h3>
+                        <p id="selected-items"><strong>Selected Items:</strong> Basic Test Package</p>
+                        <p id="total-price"><strong>Total Price:</strong> $0.00</p>
+                        <button class="proceed-button" id="action-button">Proceed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal popup for each item -->
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <h2 id="modal-title">Item Title</h2>
+                <p id="modal-description">Item Description</p>
+                <button class="close-modal" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+
+        <script>
+            const itemDetails = {
+                1: { title: "Basic Test Package", description: "BMI, Blood Pressure test, Eye test, Blood test", price: 0 },
+                2: { title: "Kidney Function Test", description: "Evaluates how well your kidneys are working by measuring levels of waste products and electrolytes in your blood.", price: 99, testId: "T002" },
+                3: { title: "HIV Test", description: "Checks for the presence of the Human Immunodeficiency Virus, which can lead to AIDS if left untreated.", price: 79, testId: "T003" },
+                4: { title: "Electrocardiogram", description: "Records the electrical activity of your heart to check for irregular heartbeats, heart attacks, or other heart conditions.", price: 190, testId: "T004" },
+                5: { title: "Lipid Test", description: "Measures cholesterol and triglyceride levels in your blood, helping assess heart disease risk.", price: 45, testId: "T005" },
+                6: { title: "MRI Scan", description: "An MRI Scan uses strong magnetic fields and radio waves to create detailed images of organs and tissues within your body.", price: 280, testId: "T006" }
+            };
+
+            const cart = {
+                selectedItems: { 1: itemDetails[1] }, // Start with full details for item 1
+                totalPrice: 0,
+
+                addItem(itemId) {
+                    if (!this.selectedItems[itemId]) {
+                        this.selectedItems[itemId] = itemDetails[itemId]; // Store full details
+                        this.totalPrice += itemDetails[itemId].price;
+                        this.save();
+                    }
+                },
+            };
+
+            // Load cart state from localStorage
+            window.onload = function () {
+                const savedCart = JSON.parse(localStorage.getItem('cart'));
+                if (savedCart) {
+                    cart.selectedItems = savedCart.selectedItems;
+                    cart.totalPrice = savedCart.totalPrice;
+                    updatePriceDisplay();
+
+                    // Disable buttons for already selected items
+                    Object.keys(cart.selectedItems).forEach(id => {
+                        if (document.getElementById(`add-button-${id}`)) {
+                            document.getElementById(`add-button-${id}`).disabled = true;
+                        }
+                    });
+                }
+            };
+
+            // Save cart state to localStorage
+            function updateCartStorage() {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+
+            //updatePriceDisplay();
+
+            function openModal(item) {
+                document.getElementById('modal-title').textContent = itemDetails[item].title;
+                document.getElementById('modal-description').textContent = itemDetails[item].description;
+                document.getElementById('modal').style.display = 'flex';
+            }
+
+            function closeModal() {
+                document.getElementById('modal').style.display = 'none';
+            }
+
+            function addToCart(itemId) {
+                if (!cart.selectedItems[itemId]) {
+                    //cart.selectedItems[itemId] = true; //ORIGINAL
+                    cart.selectedItems[itemId] = itemDetails[itemId]; // Add the item details
+                    cart.totalPrice += itemDetails[itemId].price;
+                    updateCartStorage(); // Persist state
+                    updatePriceDisplay();
+                    document.getElementById(`add-button-${itemId}`).disabled = true;
+                }
+            }
+
+            function removeFromCart(itemId) {
+                if (itemId !== 1 && cart.selectedItems[itemId]) {
+                    delete cart.selectedItems[itemId];
+                    cart.totalPrice -= itemDetails[itemId].price;
+                    updateCartStorage(); // Persist state
+                    updatePriceDisplay();
+                    document.getElementById(`add-button-${itemId}`).disabled = false;
+                }
+            }
+
+            function updatePriceDisplay() {
+                const selectedItemsContainer = document.getElementById('selected-items');
+                selectedItemsContainer.innerHTML = `<strong>Selected Items:</strong>`; // Clear current content
+
+                Object.keys(cart.selectedItems).forEach(id => {
+                    const item = itemDetails[id];
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'selected-item';
+
+                    // Only show the "Remove" button for items other than Basic Test Package (item 1)
+                    if (id == 1) {
+                        itemDiv.innerHTML = `<span>${item.title} - $${item.price.toFixed(2)}</span>`;
+                    } else {
+                        itemDiv.innerHTML = `
+                            <span>${item.title} - $${item.price.toFixed(2)}</span>
+                            <button class="remove-button" onclick="removeFromCart(${id})">Remove</button>
+                        `;
+                    }
+
+                    selectedItemsContainer.appendChild(itemDiv);
+                });
+
+                // Update total price display
+                const totalPriceElement = document.getElementById('total-price');
+                totalPriceElement.innerHTML = `<strong>Total Price:</strong> $${cart.totalPrice.toFixed(2)}`;
+
+                // Update action button text to "Pay" if items other than Basic Test Package are selected
+                const actionButton = document.getElementById('action-button');
+                const isOnlyBasicPackage = Object.keys(cart.selectedItems).length === 1 && cart.selectedItems[1];
+                actionButton.textContent = isOnlyBasicPackage ? "Proceed" : "Pay";
+            }
+
+            // window.onload = function () {
+            const recommendedGroups = JSON.parse(localStorage.getItem('recommendedGroups')) || [];
+
+            // Map group names to element IDs
+            const groupToElementId = {
+                kidney: 'recommended-kidney',
+                hiv: 'recommended-hiv',
+                electro: 'recommended-electro',
+                lipid: 'recommended-lipid',
+                mri: 'recommended-mri',
+            };
+
+            // Add "Recommended" labels for matching groups
+            recommendedGroups.forEach(group => {
+                const elementId = groupToElementId[group];
+                if (elementId) {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.innerText = 'Recommended'; // Add the "Recommended" text
+                        element.style.color = 'red'; // Optional: Add styling for visibility
+                    }
+                }
+            });
+            // };
+
+            document.getElementById('action-button').addEventListener('click', () => {
+                const employeeID = '<%= employee.employee_id %>';
+                const summary = {
+                    items: Object.values(cart.selectedItems).map(item => ({
+                        title: item.title,
+                        price: item.price
+                    })),
+                    totalPrice: cart.totalPrice
+                };
+
+                // Save to localStorage
+                localStorage.setItem('cartSummary', JSON.stringify(summary));
+
+                // Redirect to summary page
+                window.location.href = `/summary/${encodeURIComponent(employeeID)}`;
+            });
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Survey Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Lora', serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: url('/backgroundImg5.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(236, 239, 241, 0.9);
+            padding: 60px 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .container h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #005A9C;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .container h4 {
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .container h1::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -5px;
+            transform: translateX(-50%);
+            height: 3px;
+            width: 40px;
+            background: linear-gradient(135deg, #005A9C, #0072B2, #ECEFF1);
+            border-radius: 2px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #005A9C;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group .options {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .form-group .options label {
+            font-weight: normal;
+            font-size: 16px;
+            text-align: center;
+            flex: 1;
+            color: black;
+
+
+        }
+
+        .form-group .options input[type="radio"] {
+            transform: scale(1.2);
+            margin-right: 5px;
+        }
+
+        button {
+            width: 100%;
+            height: 55px;
+            background: linear-gradient(135deg, #005A9C, #0072B2);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .button-container a {
+            display: block;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(-135deg, #0072B2, #005A9C);
+            box-shadow: 0 4px 10px rgba(0, 90, 156, 0.2);
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto 0 auto;
+            width: 100%;
+            height: 55px;
+            background: #f0f0f0;
+            color: #333;
+            text-align: center;
+            line-height: 55px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #e0e0e0;
+            color: #000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media(max-width: 584px) {
+            .container {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <h1>Health Survey Form</h1>
+        <h4>Unsure on what addtional test you can take? This survey can give u recommendations.</h4>
+        <form id="health-survey-form" action="/survey/<%= employee.employee_id %>" method="POST">
+            <!-- Kidney Function Test-Specific Questions -->
+            <div class="form-group">
+                <label>Have you experienced swelling in your legs, feet, or hands?</label>
+                <div class="options">
+                    <label><input type="radio" name="swelling" value="1"> Yes</label>
+                    <label><input type="radio" name="swelling" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="swelling" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Do you often feel a burning sensation or pain during urination?</label>
+                <div class="options">
+                    <label><input type="radio" name="urination-pain" value="1"> Yes</label>
+                    <label><input type="radio" name="urination-pain" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="urination-pain" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Have you been diagnosed with diabetes or pre-diabetes?</label>
+                <div class="options">
+                    <label><input type="radio" name="diabetes-diagnosis" value="1"> Yes</label>
+                    <label><input type="radio" name="diabetes-diagnosis" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="diabetes-diagnosis" value="0"> No</label>
+                </div>
+            </div>
+
+            <!-- HIV Test-Specific Questions -->
+            <div class="form-group">
+                <label>Have you had unprotected sexual encounters with new or multiple partners?</label>
+                <div class="options">
+                    <label><input type="radio" name="unprotected-sex" value="1"> Yes</label>
+                    <label><input type="radio" name="unprotected-sex" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="unprotected-sex" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Have you ever shared needles or other drug injection equipment?</label>
+                <div class="options">
+                    <label><input type="radio" name="shared-needles" value="1"> Yes</label>
+                    <label><input type="radio" name="shared-needles" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="shared-needles" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Do you plan to conceive or are you pregnant?</label>
+                <div class="options">
+                    <label><input type="radio" name="pregnancy-plans" value="1"> Yes</label>
+                    <label><input type="radio" name="pregnancy-plans" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="pregnancy-plans" value="0"> No</label>
+                </div>
+            </div>
+
+
+            <!-- Electrocardiogram (ECG) Test-Specific Questions -->
+            <div class="form-group">
+                <label>Do you experience chest pain or discomfort, especially during physical activity?</label>
+                <div class="options">
+                    <label><input type="radio" name="chest-pain" value="1"> Yes</label>
+                    <label><input type="radio" name="chest-pain" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="chest-pain" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Have you ever felt irregular or rapid heartbeats (palpitations)?</label>
+                <div class="options">
+                    <label><input type="radio" name="irregular-heartbeats" value="1"> Yes</label>
+                    <label><input type="radio" name="irregular-heartbeats" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="irregular-heartbeats" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Have you had episodes of dizziness, fainting, or lightheadedness?</label>
+                <div class="options">
+                    <label><input type="radio" name="dizziness" value="1"> Yes</label>
+                    <label><input type="radio" name="dizziness" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="dizziness" value="0"> No</label>
+                </div>
+            </div>
+
+            <!-- Lipid Test-Specific Questions -->
+            <div class="form-group">
+                <label>Have you been diagnosed with or suspect you have high cholesterol?</label>
+                <div class="options">
+                    <label><input type="radio" name="high-cholesterol" value="1"> Yes</label>
+                    <label><input type="radio" name="high-cholesterol" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="high-cholesterol" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Do you often consume high-fat foods or have an unbalanced diet?</label>
+                <div class="options">
+                    <label><input type="radio" name="high-fat-diet" value="1"> Yes</label>
+                    <label><input type="radio" name="high-fat-diet" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="high-fat-diet" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Do you smoke or have a sedentary lifestyle?</label>
+                <div class="options">
+                    <label><input type="radio" name="smoking-sedentary" value="1"> Yes</label>
+                    <label><input type="radio" name="smoking-sedentary" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="smoking-sedentary" value="0"> No</label>
+                </div>
+            </div>
+
+            <!-- MRI Scan-Specific Questions -->
+            <div class="form-group">
+                <label>Have you experienced persistent pain or discomfort in a specific part of your body?</label>
+                <div class="options">
+                    <label><input type="radio" name="persistent-pain" value="1"> Yes</label>
+                    <label><input type="radio" name="persistent-pain" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="persistent-pain" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Have you been injured recently or had a history of trauma (e.g., car accident, fall)?</label>
+                <div class="options">
+                    <label><input type="radio" name="recent-injury" value="1"> Yes</label>
+                    <label><input type="radio" name="recent-injury" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="recent-injury" value="0"> No</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Do you have symptoms affecting your nervous system, such as numbness, tingling, or
+                    weakness?</label>
+                <div class="options">
+                    <label><input type="radio" name="nervous-system-symptoms" value="1"> Yes</label>
+                    <label><input type="radio" name="nervous-system-symptoms" value="0.5"> Sometimes</label>
+                    <label><input type="radio" name="nervous-system-symptoms" value="0"> No</label>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-container">
+                <button class="submit-button" onclick="submitSurvey()" type="submit">Submit</button>
+                <a href="/check-employee-profile/<%= employee.employee_id %>" class="back-button">Back</a>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        function submitSurvey() {
+            const groups = {
+                kidney: ['swelling', 'urination-pain', 'diabetes-diagnosis'],
+                hiv: ['unprotected-sex', 'shared-needles', 'pregnancy-plans'],
+                electro: ['chest-pain', 'irregular-heartbeats', 'dizziness'],
+                lipid: ['high-cholesterol', 'high-fat-diet', 'smoking-sedentary'],
+                mri: ['persistent-pain', 'recent-injury', 'nervous-system-symptoms'],
+            };
+
+            const scores = {};
+
+            // Calculate scores for each group
+            for (const group in groups) {
+                const questions = groups[group];
+                scores[group] = questions.reduce((total, question) => {
+                    const selectedOption = document.querySelector(`[name="${question}"]:checked`);
+                    const value = selectedOption ? parseFloat(selectedOption.value) : 0; // Default to 0 if not selected
+                    return total + value;
+                }, 0);
+            }
+
+            // Find groups with scores >= 2
+            const recommendedGroups = Object.keys(scores).filter(group => scores[group] >= 2);
+
+            // Store recommended groups in localStorage
+            localStorage.setItem('recommendedGroups', JSON.stringify(recommendedGroups));
+            alert('Survey submitted successfully!');
+
+            // Redirect back to add-ons page
+            const employeeID = '<%= employee.employee_id %>';
+            window.location.href = `/add-ons/${employeeID}`;
+        }
+    </script>
+
+</body>
+
+</html>

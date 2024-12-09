@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary</title>
+    <style>
+        body {
+            background-color: #aad9d8;
+            font-family: 'Lora';
+            margin: 0;
+            padding: 20px;
+        }
+
+        .summary-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .total-row {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: #0072B2;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        #paypal-container-X3HPGWDCVPBK2 {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .paypal-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="summary-container">
+        <h1 class="summary-title">Order Summary</h1>
+        <p><strong>Name:</strong>
+            <%= employee.name %>
+        </p>
+        <p><strong>Employee ID:</strong>
+            <%= employee.employee_id %>
+        </p>
+        <p><strong>Email:</strong>
+            <%= employee.email %>
+        </p>
+        <p><strong>Phone:</strong>
+            <%= employee.phone %>
+        </p>
+        <p><strong>Company:</strong>
+            <%= employee.company %>
+        </p>
+        <p><strong>Package:</strong>
+            <%= employee.package %>
+        </p>
+
+        <div id="cart-summary"></div>
+
+        <!-- Keep only the PayPal Hosted Button -->
+        <div id="paypal-container-X3HPGWDCVPBK2" class="paypal-center"></div>
+
+        <a href="/add-ons/<%= employee.employee_id %>" class="back-button">Back</a>
+        
+        <!-- Temp proceed button** -->
+        <form id="proceed-form" action="/proceed" method="POST" style="text-align: center; margin-top: 20px;">
+            <input type="hidden" name="employeeID" value="<%= employee.employee_id %>" />
+            <input type="hidden" id="items-input" name="items" />
+            <button type="submit" class="back-button">Proceed</button>
+        </form>
+    </div>
+
+    <!-- PayPal SDK -->
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=BAAmASv2z_C1UJ3yhvaFIyAL8Y1T37WF8ocXNHMAvQPoIEbHJb8POcawx2XHbhNXDghhLSmMLS-kxBH3q4&components=hosted-buttons&currency=SGD&disable-funding=venmo"></script>
+
+    <script>
+        // Retrieve cartSummary from localStorage
+        const cartSummary = JSON.parse(localStorage.getItem('cartSummary'));
+
+        if (cartSummary) {
+            const summaryContainer = document.getElementById('cart-summary');
+            summaryContainer.innerHTML = ''; // Clear loading message
+
+            // Display each item
+            cartSummary.items.forEach(item => {
+                if (item && item.title) { // Ensure valid item
+                    const itemRow = document.createElement('div');
+                    itemRow.className = 'item-row';
+
+                    // Create title span
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = item.title;
+
+                    // Create price span
+                    const priceSpan = document.createElement('span');
+                    priceSpan.textContent = `$${item.price.toFixed(2)}`;
+
+                    // Append spans to itemRow
+                    itemRow.appendChild(titleSpan);
+                    itemRow.appendChild(priceSpan);
+                    summaryContainer.appendChild(itemRow);
+                }
+            });
+
+            // Display total price
+            const totalRow = document.createElement('div');
+            totalRow.className = 'total-row';
+
+            const totalLabel = document.createElement('strong');
+            totalLabel.textContent = 'Total:';
+
+            const totalValue = document.createTextNode(` $${cartSummary.totalPrice.toFixed(2)}`);
+
+            totalRow.appendChild(totalLabel);
+            totalRow.appendChild(totalValue);
+            summaryContainer.appendChild(totalRow);
+
+            if (cartSummary.totalPrice > 0) {
+                paypal.HostedButtons({
+                    hostedButtonId: "X3HPGWDCVPBK2",
+                }).render("#paypal-container-X3HPGWDCVPBK2");
+            } else {
+                const paypalContainer = document.getElementById('paypal-container-X3HPGWDCVPBK2');
+                paypalContainer.innerHTML = '<p>Payment not required for Basic Test Package.</p>';
+            }
+        } else {
+            const summaryContainer = document.getElementById('cart-summary');
+            summaryContainer.innerHTML = '<p>No items in the cart.</p>';
+        }
+
+        // temp proceed script**
+        document.getElementById('proceed-form').addEventListener('submit', function (e) {
+            // Prevent default form submission to process the items dynamically
+            const items = [];
+            document.querySelectorAll('#cart-summary .item-row').forEach(row => {
+                const title = row.querySelector('span:nth-child(1)').textContent.trim();
+                const price = parseFloat(row.querySelector('span:nth-child(2)').textContent.replace('$', '').trim());
+                if (title && !isNaN(price)) {
+                    items.push({ title, price });
+                }
+            });
+
+            // Add the items to the hidden input
+            document.getElementById('items-input').value = JSON.stringify(items);
+        });
+
+    </script>
+</body>
+
+</html>
