@@ -531,6 +531,23 @@ app.post('/proceed', async (req, res) => {
     }
 });
 
+// Route to handle "report" navbar
+app.get('/employee-report/:employeeID', async (req, res) => {
+    const { employeeID } = req.params;
+
+    try {
+        const employee = await Employee.findOne({ employee_id: employeeID });
+
+        if (employee) {
+            res.render('employeeReport', { employee });
+        } else {
+            res.status(404).send('<h1>Employee not found.</h1>');
+        }
+    } catch (error) {
+        console.error('Error fetching employee report:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 app.listen(port, () => {
     console.log("server started")

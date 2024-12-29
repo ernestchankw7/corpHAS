@@ -15,6 +15,7 @@
         padding: 0;
         display: flex;
         /* Arrange items in a row */
+        white-space: nowrap;
     }
 
     li {
@@ -57,5 +58,7 @@
         <% } %>
 
         <li id="navBar"><a href="/add-ons/<%= employeeID %>">Add Ons</a></li>
+        <!-- New Report Navigation Option -->
+        <li><a href="/employee-report/<%= employeeID %>">View Report</a></li>
     </ul>
 </nav>

@@ -21,9 +21,6 @@
             overflow-x: hidden;
             margin-top: 80px;
             background-color: #aad9d8;
-            /* background: url('/backgroundImg5.jpg') no-repeat center;
-            background-size: cover; 
-            background-attachment: fixed; */
         }
 
         /* Main container to hold the catalog grid and sidebar */
@@ -309,11 +306,59 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        /* Survey Banner Styling */
+        #survey-banner {
+            background: linear-gradient(to right, #aad9d8, #85d8ce 50%, #aad9d8);
+            height: 20px;
+            width: 500px;
+            position: absolute;
+            text-align: center;
+            top: 65px;
+            justify-content: space-between;
+        }
+
+        /* Link styling inside the banner */
+        #survey-link {
+            color: white;
+            font-size: 15px;
+        }
+
+        /* Close button styling */
+        #survey-banner button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            font-size: 20px;
+            line-height: 1;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        #survey-link:hover {
+            color: #005A9C;
+            /* Blue color on hover */
+            transform: scale(1.1);
+            /* Slight zoom effect */
+        }
+
+        #survey-banner button:hover {
+            transform: scale(1.3);
+            /* Enlarge button slightly */
+        }
     </style>
 </head>
 
 <body>
     <%- include('navbar', { employeeID: employee.employee_id }) %>
+        <!-- Survey Banner -->
+        <div id="survey-banner">
+            <a href="/survey/<%= employee.employee_id %>" id="survey-link">
+                Unsure on which test to choose? Take a survey.
+            </a>
+            <button id="close-banner">&times;</button>
+            <!-- <button id="close-banner">x</button> -->
+        </div>
         <div class="main-container">
             <!-- Catalog grid for items -->
             <div class="catalog-grid">
@@ -480,6 +525,10 @@
                         }
                     });
                 }
+                // Check if the banner should be displayed
+                if (!localStorage.getItem('hideSurveyBanner')) {
+                    document.getElementById('survey-banner').style.display = 'block';
+                }
             };
 
             // Save cart state to localStorage
@@ -575,7 +624,6 @@
                     }
                 }
             });
-            // };
 
             document.getElementById('action-button').addEventListener('click', () => {
                 const employeeID = '<%= employee.employee_id %>';
@@ -592,6 +640,12 @@
 
                 // Redirect to summary page
                 window.location.href = `/summary/${encodeURIComponent(employeeID)}`;
+            });
+
+            // Close the banner and remember the user's preference
+            document.getElementById('close-banner').addEventListener('click', () => {
+                document.getElementById('survey-banner').style.display = 'none';
+                localStorage.setItem('hideSurveyBanner', 'true'); // Remember the banner is dismissed
             });
         </script>
 </body>
