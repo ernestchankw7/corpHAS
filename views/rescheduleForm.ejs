@@ -31,7 +31,6 @@
             padding: 80px 80px;
             border-radius: 10px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            margin-top: 60px;
         }
 
         .container h1 {
@@ -58,16 +57,22 @@
         label {
             font-weight: bold;
             color: #005A9C;
+            margin-bottom: 5px;
+            display: block;
         }
 
         .input-box {
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .input-box label {
             display: block;
-            margin-bottom: 5px;
+
+        }
+
+        input {
+            height: 50px;
         }
 
         .input-box input,
@@ -86,13 +91,16 @@
             width: 100%;
             height: 50px;
             font-size: 16px;
+            border: 1px solid #ccc;
             padding: 10px;
-            margin-bottom: 30px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
 
         textarea {
             resize: vertical;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+
         }
 
         .input-box input:focus,
@@ -154,136 +162,140 @@
 
 <body>
     <%- include('navbar', { employeeID: employeeID }) %>
-    <div class="container">
-        <h1>Reschedule Appointment</h1>
-        <form action="/reschedule-appointment/<%= appointment.employee_id %>" method="POST">
-            <label for="date">Date:</label>
-            <input type="date" id="date" name="date" value="<%= appointment.date.toISOString().split('T')[0] %>" required>
-        
-            <div class="input-box">
-                <label for="time">Preferred Appointment Time:</label>
-                <select id="time" name="time" required>
-                    <option value="" disabled selected>Select a time</option>
-                    <option value="<%= appointment.time %>" selected><%= appointment.time %></option>
-                </select>
+        <div class="container">
+            <h1>Reschedule Appointment</h1>
+            <form action="/reschedule-appointment/<%= appointment.employee_id %>" method="POST">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" value="<%= appointment.date.toISOString().split('T')[0] %>"
+                    required>
+
+                <div class="input-box">
+                    <label for="time">Preferred Appointment Time:</label>
+                    <select id="time" name="time" required>
+                        <option value="" disabled selected>Select a time</option>
+                        <option value="<%= appointment.time %>" selected>
+                            <%= appointment.time %>
+                        </option>
+                    </select>
+                </div>
+
+                <label for="reason">Reason for Visit:</label>
+                <textarea id="reason" name="reason" rows="4" required><%= appointment.reason %></textarea>
+
+                <label for="specialRequests">Special Requests:</label>
+                <textarea id="specialRequests" name="specialRequests"
+                    rows="4"><%= appointment.specialRequests || '' %></textarea>
+
+                <button type="submit">Reschedule Appointment</button>
+            </form>
+
+            <!-- Countdown timer display -->
+            <div id="countdown" class="countdown-timer">
+                Time remaining: <span id="timeRemaining">00:30</span>
             </div>
-        
-            <label for="reason">Reason for Visit:</label>
-            <textarea id="reason" name="reason" rows="4" required><%= appointment.reason %></textarea>
-        
-            <label for="specialRequests">Special Requests:</label>
-            <textarea id="specialRequests" name="specialRequests" rows="4"><%= appointment.specialRequests || '' %></textarea>
-        
-            <button type="submit">Reschedule Appointment</button>
-        </form>
-
-        <!-- Countdown timer display -->
-        <div id="countdown" class="countdown-timer">
-            Time remaining: <span id="timeRemaining">00:30</span>
         </div>
-    </div>
-    <script>
-        const selectElement = document.getElementById('time');
-        const dateInput = document.getElementById('date');
-        const countdownElement = document.getElementById("timeRemaining");
-    
-        // Variable to store the countdown interval
-        let countdownInterval;
-    
-        // Function to populate the select options with time slots
-        function populateTimeSlots(date) {
-            const startHour = 9; // 9 AM
-            const endHour = 18; // 6 PM
-            const interval = 10; // 10 minutes
-    
-            // Clear previous time options
-            selectElement.innerHTML = '<option value="" disabled selected>Select a time</option>';
-    
-            const now = new Date();
-            const selectedDate = new Date(date);
-            const isToday = selectedDate.toDateString() === now.toDateString();
-    
-            // Check if the selected date is today and block past times
-            for (let hour = startHour; hour <= endHour; hour++) {
-                for (let minute = 0; minute < 60; minute += interval) {
-                    // Special handling for 6 PM to only show 6:00 PM
-                    if (hour === endHour && minute > 0) {
-                        break;
+        <script>
+            const selectElement = document.getElementById('time');
+            const dateInput = document.getElementById('date');
+            const countdownElement = document.getElementById("timeRemaining");
+
+            // Variable to store the countdown interval
+            let countdownInterval;
+
+            // Function to populate the select options with time slots
+            function populateTimeSlots(date) {
+                const startHour = 9; // 9 AM
+                const endHour = 18; // 6 PM
+                const interval = 10; // 10 minutes
+
+                // Clear previous time options
+                selectElement.innerHTML = '<option value="" disabled selected>Select a time</option>';
+
+                const now = new Date();
+                const selectedDate = new Date(date);
+                const isToday = selectedDate.toDateString() === now.toDateString();
+
+                // Check if the selected date is today and block past times
+                for (let hour = startHour; hour <= endHour; hour++) {
+                    for (let minute = 0; minute < 60; minute += interval) {
+                        // Special handling for 6 PM to only show 6:00 PM
+                        if (hour === endHour && minute > 0) {
+                            break;
+                        }
+
+                        const time = new Date();
+                        time.setHours(hour);
+                        time.setMinutes(minute);
+
+                        // Block past times if it's today
+                        if (isToday && time < now) {
+                            continue;
+                        }
+
+                        const formattedTime = time.toTimeString().slice(0, 5); // Format as HH:MM
+
+                        // Create option element
+                        const option = document.createElement('option');
+                        option.value = formattedTime;
+                        option.textContent = formattedTime;
+
+                        selectElement.appendChild(option);
                     }
-    
-                    const time = new Date();
-                    time.setHours(hour);
-                    time.setMinutes(minute);
-    
-                    // Block past times if it's today
-                    if (isToday && time < now) {
-                        continue;
-                    }
-    
-                    const formattedTime = time.toTimeString().slice(0, 5); // Format as HH:MM
-    
-                    // Create option element
-                    const option = document.createElement('option');
-                    option.value = formattedTime;
-                    option.textContent = formattedTime;
-    
-                    selectElement.appendChild(option);
                 }
             }
-        }
-    
-        // Set minimum date to today for date input
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today;
-    
-        // Event listener for date change
-        dateInput.addEventListener('change', function () {
-            populateTimeSlots(dateInput.value);
-        });
-    
-        // Event listener for time selection change
-        selectElement.addEventListener('change', function () {
-            if (selectElement.value) {
-                startCountdown(); // Start countdown when time is selected
-            } else {
-                resetCountdown(); // Reset countdown if time is cleared
-            }
-        });
 
+            // Set minimum date to today for date input
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.min = today;
 
-// Populate times for the initial date (today)
-        populateTimeSlots(today);
-    
-        // Countdown timer logic
-        let timeLeft = 30; // 30 seconds countdown as an example
-    
-        function startCountdown() {
-            // Reset time and start countdown
-            timeLeft = 30; // Reset countdown to 30 seconds
-            countdownInterval = setInterval(function () {
-                const minutes = Math.floor(timeLeft / 60);  // Get the number of minutes
-                const seconds = timeLeft % 60;  // Get the number of seconds
-    
-                // Format time as MM:SS (always show two digits for minutes and seconds)
-                countdownElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    
-                // Decrease the time left by 1 second
-                timeLeft--;
-    
-                // If time runs out, clear interval and redirect
-                if (timeLeft < 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = "/check-employee-profile/<%= appointment.employee_id %>"; // Redirect to the employee details page
+            // Event listener for date change
+            dateInput.addEventListener('change', function () {
+                populateTimeSlots(dateInput.value);
+            });
+
+            // Event listener for time selection change
+            selectElement.addEventListener('change', function () {
+                if (selectElement.value) {
+                    startCountdown(); // Start countdown when time is selected
+                } else {
+                    resetCountdown(); // Reset countdown if time is cleared
                 }
-            }, 1000); // Update every second
-        }
-    
-        function resetCountdown() {
-            // Reset the countdown timer when time is cleared
-            clearInterval(countdownInterval);
-            countdownElement.textContent = "Time remaining: 00:30"; // Reset countdown display
-        }
-    </script>
+            });
+
+
+            // Populate times for the initial date (today)
+            populateTimeSlots(today);
+
+            // Countdown timer logic
+            let timeLeft = 30; // 30 seconds countdown as an example
+
+            function startCountdown() {
+                // Reset time and start countdown
+                timeLeft = 30; // Reset countdown to 30 seconds
+                countdownInterval = setInterval(function () {
+                    const minutes = Math.floor(timeLeft / 60);  // Get the number of minutes
+                    const seconds = timeLeft % 60;  // Get the number of seconds
+
+                    // Format time as MM:SS (always show two digits for minutes and seconds)
+                    countdownElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                    // Decrease the time left by 1 second
+                    timeLeft--;
+
+                    // If time runs out, clear interval and redirect
+                    if (timeLeft < 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = "/check-employee-profile/<%= appointment.employee_id %>"; // Redirect to the employee details page
+                    }
+                }, 1000); // Update every second
+            }
+
+            function resetCountdown() {
+                // Reset the countdown timer when time is cleared
+                clearInterval(countdownInterval);
+                countdownElement.textContent = "Time remaining: 00:30"; // Reset countdown display
+            }
+        </script>
 </body>
 
 </html>

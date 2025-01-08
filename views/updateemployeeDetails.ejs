@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+<head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Employee Details</title>
@@ -12,18 +11,21 @@
             box-sizing: border-box;
             font-family: 'Lora', serif;
         }
-
+ 
         body {
-            height: 110vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 10px;
-            background: url('/backgroundImg5.jpg') no-repeat center center fixed;
+            background: url('/LoginImage.jpg') no-repeat center center fixed;
             background-size: cover;
             color: #333;
         }
-
+        input{
+            height: 50px !important;
+ 
+        }
         .container {
             width: 60%;
             max-width: 600px;
@@ -32,7 +34,7 @@
             border-radius: 10px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
-
+ 
         .container h1 {
             font-size: 28px;
             font-weight: bold;
@@ -41,7 +43,7 @@
             text-align: center;
             position: relative;
         }
-
+ 
         .container h1::before {
             content: "";
             position: absolute;
@@ -53,18 +55,18 @@
             background: linear-gradient(135deg, #005A9C, #0072B2, #ECEFF1);
             border-radius: 2px;
         }
-
+ 
         label {
             font-weight: bold;
             color: #005A9C;
             display: block;
             margin-bottom: 5px;
         }
-
+ 
         .input-box {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-
+ 
         input,
         textarea {
             width: 100%;
@@ -75,22 +77,22 @@
             border: 1px solid #ccc;
             transition: all 0.3s ease;
         }
-
+ 
         textarea {
             resize: vertical;
         }
-
+ 
         input:focus,
         textarea:focus {
             border-color: #005A9C;
             box-shadow: 0 0 5px rgba(0, 90, 156, 0.3);
         }
-
+ 
         .button-container {
             display: flex;
             justify-content: space-between;
         }
-
+ 
         button {
             width: 48%;
             height: 45px;
@@ -103,12 +105,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+ 
         button:hover {
             background: linear-gradient(-135deg, #0072B2, #005A9C);
             box-shadow: 0 4px 10px rgba(0, 90, 156, 0.2);
         }
-
+ 
         a {
             text-decoration: none;
             display: block;
@@ -120,11 +122,11 @@
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
-
+ 
         a:hover {
             background-color: #eceff1;
         }
-
+ 
         @media(max-width: 584px) {
             .container {
                 width: 100%;
@@ -133,36 +135,35 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>Update Employee Details</h1>
         <form action="/update-employee/<%= employee.employee_id %>" method="POST">
             <div class="input-box">
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" value="<%= employee.name %>" required>
+                <input type="text" id="name" name="name" value="<%= employee.name %>" readonly>
             </div>
-
+           
             <div class="input-box">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" value="<%= employee.email %>" required>
             </div>
-
+           
             <div class="input-box">
                 <label for="phone">Phone:</label>
                 <input type="text" id="phone" name="phone" value="<%= employee.phone %>" required>
             </div>
-
+           
             <div class="input-box">
                 <label for="company">Company:</label>
                 <input type="text" id="company" name="company" value="<%= employee.company %>" readonly>
             </div>
-
+           
             <div class="input-box">
                 <label for="package">Package:</label>
                 <input type="text" id="package" name="package" value="<%= employee.package %>" readonly>
             </div>
-
+           
             <div class="button-container">
                 <button type="submit">Update</button>
                 <a href="/check-employee-profile/<%= employee.employee_id %>">Back</a>
@@ -170,5 +171,4 @@
         </form>
     </div>
 </body>
-
 </html>

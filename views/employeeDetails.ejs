@@ -14,7 +14,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: url('/LoginImage.jpg');
+            background: url('/backgroundImg5.jpg');
             background-size: cover;
             background-position: center;
         }
@@ -28,8 +28,7 @@
             max-width: 600px;
             width: 100%;
             min-height: 300px;
-            padding: 40px 40px;
-            margin-top: 60px;
+            padding: 60px 40px;
         }
 
         h1 {
@@ -76,6 +75,9 @@
             margin-top: 20px;
         }
     </style>
+
+
+    <link rel="stylesheet" href="/css/emp-details.css">
 </head>
 
 <body>
@@ -120,17 +122,9 @@
                                     <% } %>
                                         <a href="/" class="btn signout-btn" onclick="clearCartAndSignOut(event)">Sign
                                             Out</a>
-                                        <!-- Temp Report Button** -->
-                                        <a href="/generate-report/<%= employee.employee_id %>" class="btn">Generate Report</a>
                         </div>
-
-                        <!-- <div style="margin-top: 20px;">
-                            <a href="/survey/<%= employee.employee_id %>"
-                                style="color: #000000; font-size: 16px; text-decoration: underline;">
-                                Unsure on which test to choose? Take a survey.
-                            </a>
-                        </div> -->
         </div>
+
         <script>
             function clearCartAndSignOut(event) {
                 event.preventDefault(); // Prevent the default link behavior
@@ -138,6 +132,7 @@
                 // Clear the cart from localStorage
                 localStorage.removeItem('cart');
                 localStorage.removeItem('recommendedGroups');
+
 
                 // Redirect to the sign-out route (or home page)
                 window.location.href = "/";

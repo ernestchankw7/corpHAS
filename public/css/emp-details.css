@@ -1,0 +1,39 @@
+@media screen and (max-width:770px) {
+    *{
+        box-sizing: border-box;
+    }
+    .container{
+        width: 95%;
+        max-width: 95%;
+        padding: 40px;
+    }
+    .container h1{
+        margin-top: 0px ;
+    }
+    .container  .btn{
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+}
+ 
+@media screen and (max-width:590px) {
+    .container {
+        padding:30px 20px;
+    }
+    .button-container{
+        flex-direction: column;
+        gap: 10px;
+    }
+    .button-container .btn{
+        margin: 0px;
+    }
+    .container p{
+        font-size: 18px;
+    }
+    .container h1{
+        font-size: 35px;
+    }
+    .container a{
+        font-size: 13px !important;
+    }
+}

@@ -343,20 +343,31 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
         // Log the employee_id to ensure it's being passed correctly
         console.log('Employee ID from URL:', employee_id);
 
-        // Find the latest appointment for the employee
-        const updatedAppointment = await PatientAppointmentBooking.findOneAndUpdate(
-            { employee_id },
-            { date, time, reason, specialRequests },
-            { new: true }  // Return the updated document
-        );
+        // Fetch the current appointment for the employee
+        const currentAppointment = await PatientAppointmentBooking.findOne({ employee_id });
 
-        if (!updatedAppointment) {
+        if (!currentAppointment) {
             console.log('Appointment not found for employee:', employee_id);
             return res.status(404).send("Appointment not found");
         }
 
-        // Send updated confirmation email (optional)
-        const employee = await Employee.findOne({ employee_id: updatedAppointment.employee_id });
+        // Save the previous appointment details
+        const previousAppointment = {
+            date: currentAppointment.date,
+            time: currentAppointment.time,
+            reason: currentAppointment.reason,
+            specialRequests: currentAppointment.specialRequests || "None"
+        };
+
+        // Update the appointment with new details
+        currentAppointment.date = date;
+        currentAppointment.time = time;
+        currentAppointment.reason = reason;
+        currentAppointment.specialRequests = specialRequests;
+        await currentAppointment.save();
+
+        // Send updated confirmation email with previous and new details
+        const employee = await Employee.findOne({ employee_id: currentAppointment.employee_id });
         if (employee) {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
@@ -374,7 +385,14 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                     <h1>Appointment Rescheduled</h1>
                     <p>Dear ${employee.name},</p>
                     <p>Your appointment has been successfully rescheduled!</p>
-                    <p><strong>Updated Details:</strong></p>
+                    <p><strong>Previous Appointment Details:</strong></p>
+                    <ul>
+                        <li>Date: ${new Date(previousAppointment.date).toDateString()}</li>
+                        <li>Time: ${previousAppointment.time}</li>
+                        <li>Reason: ${previousAppointment.reason}</li>
+                        <li>Special Requests: ${previousAppointment.specialRequests}</li>
+                    </ul>
+                    <p><strong>New Appointment Details:</strong></p>
                     <ul>
                         <li>Date: ${new Date(date).toDateString()}</li>
                         <li>Time: ${time}</li>
@@ -391,37 +409,27 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
         // Send response confirming the reschedule
         res.send(`
             <h1>Appointment rescheduled successfully!</h1>
-            <p>New Date: ${new Date(date).toDateString()}</p>
-            <p>New Time: ${time}</p>
-            <p>Reason for Visit: ${reason}</p>
-            <p>Special Requests: ${specialRequests}</p>
-            <a href="/check-employee-profile/${updatedAppointment.employee_id}">Back to Home</a>
+            <p><strong>Previous Details:</strong></p>
+            <ul>
+                <li>Date: ${new Date(previousAppointment.date).toDateString()}</li>
+                <li>Time: ${previousAppointment.time}</li>
+                <li>Reason: ${previousAppointment.reason}</li>
+                <li>Special Requests: ${previousAppointment.specialRequests}</li>
+            </ul>
+            <p><strong>New Details:</strong></p>
+            <ul>
+                <li>Date: ${new Date(date).toDateString()}</li>
+                <li>Time: ${time}</li>
+                <li>Reason: ${reason}</li>
+                <li>Special Requests: ${specialRequests}</li>
+            </ul>
+            <a href="/check-employee-profile/${currentAppointment.employee_id}">Back to Home</a>
         `);
 
-    } catch (error) {
+
+} catch (error) {
         console.error('Error:', error.stack);
         res.status(500).send(`Server error while rescheduling appointment: ${error.message}`);
-    }
-});
-
-app.get('/reschedule-appointment/:employee_id', async (req, res) => {
-    const { employee_id } = req.params;
-
-    try {
-        // Fetch the appointment based on employee_id
-        const appointment = await PatientAppointmentBooking.findOne({ employee_id });
-
-        if (appointment) {
-            // Pass the appointment and employee_id to the EJS template
-            res.render('rescheduleForm', { appointment, employeeID: employee_id });
-        } else {
-            // Handle case where no appointment is found
-            res.send("<h1>No appointment found for this employee ID.</h1>");
-        }
-    } catch (error) {
-        // Log any potential error during the query
-        console.error("Error fetching appointment:", error);
-        res.status(500).send("Server error");
     }
 });
 
@@ -429,84 +437,6 @@ app.get('/reschedule-form', (req, res) => {
     res.render('rescheduleForm');
 });
 
-//temp route for report**
-app.get('/generate-report/:employee_id', async (req, res) => {
-    const { employee_id } = req.params;
-
-    try {
-        const employee = await Employee.findOne({ employee_id });
-
-        if (employee) {
-            res.render('tempReportGene', { employee });
-        } else {
-            res.send("<h1>Employee ID not found.</h1>");
-        }
-    } catch (error) {
-        console.error("Error:", error.message);
-        res.status(500).send("Server error");
-    }
-});
-// Fetch all employees**
-app.get('/api/employees', async (req, res) => {
-    try {
-        const employees = await Employee.find();
-        res.json(employees);
-    } catch (error) {
-        console.error('Error fetching employees:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-// Route to generate PDF report**
-app.get('/generate-pdf', async (req, res) => {
-    try {
-        const employees = await Employee.find();
-
-        // Create a new PDF document
-        const doc = new PDFDocument();
-        const filename = `employee_report_${Date.now()}.pdf`;
-
-        // Set headers for PDF download
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-
-        doc.pipe(res);
-
-        // Title
-        doc.fontSize(18).text('Employee Report', { align: 'center' });
-        doc.moveDown();
-
-        // Employee Details in Table Format
-        employees.forEach(employee => {
-            doc
-                .fontSize(14)
-                .text(`Employee ID: ${employee.employee_id || 'N/A'}`)
-                .text(`Name: ${employee.name || 'N/A'}`)
-                .text(`Email: ${employee.email || 'N/A'}`)
-                .text(`Phone: ${employee.phone || 'N/A'}`)
-                .text(`Company: ${employee.company || 'N/A'}`)
-                .text(`Package: ${employee.package || 'N/A'}`)
-                .moveDown();
-        });
-
-        doc.end(); // Finalize the PDF
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        res.status(500).send('Error generating PDF');
-    }
-});
-
-// Define Test Items Schema**
-const testItemSchema = new mongoose.Schema({
-    employeeID: { type: String, required: true },
-    items: [
-        {
-            title: { type: String, required: true },
-            // price: { type: Number, required: true },
-        }
-    ]
-});
-
-const TestItem = mongoose.model("TestItem", testItemSchema);
 
 // Route to handle "Proceed" button**
 app.post('/proceed', async (req, res) => {

@@ -1,0 +1,10 @@
+.grid-login-area{
+    display: grid;
+    grid-template-columns: 400px 1fr;
+}
+@media screen and (max-width:440px) {
+    .wrapper{
+    width: 95%;
+    padding: 30px 20px;
+    }
+}

@@ -1,491 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Items</title>
-    <style>
-        /* Basic reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Lora';
-            display: flex;
-            justify-content: center;
-            /* background-color: #f5f5f5; */
-            overflow-x: hidden;
-            margin-top: 80px;
-            background-color: #aad9d8;
-        }
-
-        /* Main container to hold the catalog grid and sidebar */
-        .main-container {
-            display: flex;
-            gap: 20px;
-            max-width: 1200px;
-            width: 100%;
-            padding: 20px;
-        }
-
-        /* Catalog grid styling */
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            width: 100%;
-            margin-right: 270px;
-        }
-
-        /* Catalog item styling */
-        .catalog-item {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .catalog-item .content {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-            /* Ensures buttons are aligned */
-        }
-
-
-        .catalog-item:hover {
-            transform: scale(1.05);
-        }
-
-        .catalog-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .content {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            /* Ensures content takes available space */
-        }
-
-        .content h3 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #000000;
-        }
-
-        .content p {
-            font-size: 1em;
-            margin-bottom: 15px;
-            color: #000000;
-        }
-
-        .content button {
-            font-family: 'Lora';
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #0072B2;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1em;
-        }
-
-        /* Sidebar styling */
-        .sidebar {
-            /* position: sticky; */
-            top: 20px;
-            width: 250px;
-            background-color: rgba(255, 255, 255, 0);
-            /* Transparent white background */
-            border: 1px solid #000000;
-            /* Light gray border */
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            align-self: start;
-            margin-top: 80px;
-        }
-
-        .sidebar-price {
-            /* position: sticky; */
-            top: 20px;
-            width: 250px;
-            max-height: 400px;
-            background-color: rgba(255, 255, 255, 0);
-            /* Transparent white background */
-            border: 1px solid #000000;
-            /* Light gray border */
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            align-self: start;
-            overflow: hidden;
-        }
-
-        #selected-items {
-            max-height: 150px;
-            /* Limit height of selected items section */
-            overflow-y: auto;
-            /* Enable vertical scroll */
-            margin-top: 10px;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-
-        .sidebar h3 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #000000;
-        }
-
-        .sidebar p {
-            font-size: 1em;
-            color: #000000;
-            margin-bottom: 10px;
-            /* white-space: nowrap; */
-        }
-
-        /* Modal styling */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .modal-content h2 {
-            margin-bottom: 15px;
-            font-size: 2em;
-        }
-
-        .modal-content p {
-            margin-bottom: 20px;
-        }
-
-        .close-modal {
-            padding: 10px 20px;
-            background-color: #0072B2;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-        }
-
-        /* Responsive styling for smaller screens */
-        @media (max-width: 768px) {
-            .catalog-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .main-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .catalog-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        /* Sidebar container to stack sidebars vertically */
-        .sidebar-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            /* Space between sidebars */
-            /* position: sticky; */
-            position: fixed;
-            top: 20px;
-            /* Distance from top of the viewport */
-            right: 80px;
-            /* Adjust as needed to position it on the right */
-            width: 250px;
-        }
-
-        .price {
-            font-weight: bold;
-            /* Makes the price stand out */
-            font-size: 1.1em;
-            /* Slightly increases the font size */
-        }
-
-        .view-button {
-            margin-top: auto;
-            /* Pushes the button to the bottom of the content */
-            align-self: center;
-            padding: 10px 10px;
-            background-color: #0072B2;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-
-        .add-button-container {
-            display: flex;
-            /* Use flexbox for alignment */
-            justify-content: space-between;
-            /* Spread the Add button and price apart */
-            align-items: center;
-            /* Vertically align the button and price */
-            /* margin-top: auto; */
-            /* Pushes it to the bottom of the content */
-            padding-top: 30px;
-            /* Adds some padding between content and Add section */
-        }
-
-        .proceed-button {
-            font-family: 'Lora';
-            background-color: #0072B2;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 20px;
-            align-self: center;
-        }
-
-        .selected-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .remove-button {
-            padding: 5px 10px;
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        /* Survey Banner Styling */
-        #survey-banner {
-            background: linear-gradient(to right, #aad9d8, #85d8ce 50%, #aad9d8);
-            height: 20px;
-            width: 500px;
-            position: absolute;
-            text-align: center;
-            top: 65px;
-            justify-content: space-between;
-        }
-
-        /* Link styling inside the banner */
-        #survey-link {
-            color: white;
-            font-size: 15px;
-        }
-
-        /* Close button styling */
-        #survey-banner button {
-            background-color: transparent;
-            color: white;
-            border: none;
-            font-size: 20px;
-            line-height: 1;
-            vertical-align: middle;
-            cursor: pointer;
-        }
-
-        #survey-link:hover {
-            color: #005A9C;
-            /* Blue color on hover */
-            transform: scale(1.1);
-            /* Slight zoom effect */
-        }
-
-        #survey-banner button:hover {
-            transform: scale(1.3);
-            /* Enlarge button slightly */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Items</title>
+  <style>
+    /* Basic reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+ 
+    body {
+      font-family: Lora, sans-serif;
+      display: flex;
+      justify-content: center;
+      background-color: #aad9d8;
+      overflow-x: hidden;
+      margin-top: 80px;
+    }
+ 
+    /* Main container to hold the catalog grid and sidebar */
+    .main-container {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      width: 100%;
+      padding: 20px;
+    }
+ 
+    /* Catalog grid styling */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+      margin-right: 270px;
+    }
+ 
+    /* Catalog item styling */
+    .catalog-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+ 
+    .catalog-item .content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      /* justify-content: space-between; */
+      /* Ensures buttons are aligned */
+    }
+ 
+    .catalog-item:hover {
+      transform: scale(1.05);
+    }
+ 
+    .catalog-item img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+ 
+    .content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      /* Ensures content takes available space */
+    }
+ 
+    .content h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #000000;
+    }
+ 
+    .content p {
+      font-size: 1em;
+      margin-bottom: 15px;
+      color: #000000;
+    }
+ 
+    .content button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #0072b2;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+    }
+ 
+    /* Sidebar styling */
+    .sidebar {
+      /* position: sticky; */
+      top: 20px;
+      /* width: 250px; */
+      background-color: rgba(255, 255, 255, 0);
+      /* Transparent white background */
+      border: 1px solid #000000;
+      /* Light gray border */
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      align-self: start;
+      margin-top: 80px;
+    }
+ 
+    .sidebar-price {
+      /* position: sticky; */
+      top: 20px;
+      /* width: 250px; */
+      max-height: 400px;
+      background-color: rgba(255, 255, 255, 0);
+      /* Transparent white background */
+      border: 1px solid #000000;
+      /* Light gray border */
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      align-self: start;
+      overflow: hidden;
+    }
+ 
+    #selected-items {
+      max-height: 150px;
+      /* Limit height of selected items section */
+      overflow-y: auto;
+      /* Enable vertical scroll */
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+ 
+    .sidebar h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #000000;
+    }
+ 
+    .sidebar p {
+      font-size: 1em;
+      color: #000000;
+      margin-bottom: 10px;
+      /* white-space: nowrap; */
+    }
+ 
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+ 
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+ 
+    .modal-content h2 {
+      margin-bottom: 15px;
+      font-size: 2em;
+    }
+ 
+    .modal-content p {
+      margin-bottom: 20px;
+    }
+ 
+    .close-modal {
+      padding: 10px 20px;
+      background-color: #0072b2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+    }
+ 
+    /* Responsive styling for smaller screens */
+    @media (max-width: 768px) {
+      .catalog-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+ 
+    @media (max-width: 480px) {
+      .main-container {
+        /* flex-direction: column; */
+        /* align-items: center; */
+      }
+ 
+      .catalog-grid {
+        grid-template-columns: 1fr;
+      }
+ 
+      .sidebar {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+ 
+    /* Sidebar container to stack sidebars vertically */
+    .sidebar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      /* Space between sidebars */
+      /* position: sticky; */
+      position: fixed;
+      top: 20px;
+      /* Distance from top of the viewport */
+      right: 80px;
+      /* Adjust as needed to position it on the right */
+ 
+    }
+ 
+    .price {
+      font-weight: bold;
+      /* Makes the price stand out */
+      font-size: 1.1em;
+      /* Slightly increases the font size */
+    }
+ 
+    .view-button {
+      margin-top: auto;
+      /* Pushes the button to the bottom of the content */
+      align-self: center;
+      padding: 10px 10px;
+      background-color: #0072b2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+ 
+    .add-button-container {
+      display: flex;
+      /* Use flexbox for alignment */
+      justify-content: space-between;
+      /* Spread the Add button and price apart */
+      align-items: center;
+      /* Vertically align the button and price */
+      /* margin-top: auto; */
+      /* Pushes it to the bottom of the content */
+      padding-top: 30px;
+      /* Adds some padding between content and Add section */
+    }
+ 
+    .proceed-button {
+      background-color: #0072b2;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 20px;
+      align-self: center;
+    }
+ 
+    .selected-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+ 
+    .remove-button {
+      padding: 5px 10px;
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+ 
+ 
+    /* Survey Banner Styling */
+    #survey-banner {
+      background: linear-gradient(to right, #aad9d8, #85d8ce 50%, #aad9d8);
+      height: 20px;
+      width: 500px;
+      position: absolute;
+      text-align: center;
+      top: 65px;
+      justify-content: space-between;
+    }
+ 
+    /* Link styling inside the banner */
+    #survey-link {
+      color: rgb(255, 255, 255);
+      font-size: 15px;
+    }
+ 
+    /* Close button styling */
+    #survey-banner button {
+      background-color: transparent;
+      color: white;
+      border: none;
+      font-size: 20px;
+      line-height: 1;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+ 
+    #survey-link:hover {
+      color: #005A9C;
+      /* Blue color on hover */
+      transform: scale(1.1);
+      /* Slight zoom effect */
+    }
+ 
+    #survey-banner button:hover {
+      transform: scale(1.3);
+      /* Enlarge button slightly */
+    }
+  </style>
+ 
+  <link rel="stylesheet" href="/css/addons.css">
 </head>
-
+ 
 <body>
-    <%- include('navbar', { employeeID: employee.employee_id }) %>
-        <!-- Survey Banner -->
-        <div id="survey-banner">
-            <a href="/survey/<%= employee.employee_id %>" id="survey-link">
-                Unsure on which test to choose? Take a survey.
-            </a>
-            <button id="close-banner">&times;</button>
-            <!-- <button id="close-banner">x</button> -->
-        </div>
-        <div class="main-container">
-            <!-- Catalog grid for items -->
-            <div class="catalog-grid">
-                <!-- Six catalog items in a 3x2 grid layout -->
-                <div class="catalog-item" data-item="1">
-                    <img src="/BasicTest.jpg" alt="Item 1">
-                    <div class="content">
-                        <h3>Basic Test package</h3>
-                        <p>The tests included are free of charge.</p>
-                        <!-- <button onclick="openModal(1)">View Details</button> -->
-                        <button class="view-button" onclick="openModal(1)">View Details</button>
-                        <div class="add-button-container">
-                            <button class="add-button" id="add-button-1" onclick="addToCart(1)" disabled>Add</button>
-                            <span class="price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="catalog-item" data-item="2">
-                    <img src="/KidneyFunction.jpg" alt="Item 2">
-                    <div class="content">
-                        <h3>Kidney function test</h3>
-                        <span id="recommended-kidney" class="recommended-tag"></span>
-                        <p>Evaluates kidney function</p>
-                        <button class="view-button" onclick="openModal(2)">View Details</button>
-                        <div class="add-button-container">
-                            <button class="add-button" id="add-button-2" onclick="addToCart(2)">Add</button>
-                            <span class="price">$99.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="catalog-item" data-item="3">
-                    <img src="/HIV.jpg" alt="Item 3">
-                    <div class="content">
-                        <h3>HIV test</h3>
-                        <span id="recommended-hiv" class="recommended-tag"></span>
-                        <p>Checks for HIV.</p>
-                        <button class="view-button" onclick="openModal(3)">View Details</button>
-                        <div class="add-button-container">
-                            <button class="add-button" id="add-button-3" onclick="addToCart(3)">Add</button>
-                            <span class="price">$79.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="catalog-item" data-item="4">
-                    <img src="/electro.jpg" alt="Item 4">
-                    <div class="content">
-                        <h3>Electrocardiogram</h3>
-                        <span id="recommended-electro" class="recommended-tag"></span>
-                        <p>Records heart's electrical activity</p>
-                        <button class="view-button" onclick="openModal(4)">View Details</button>
-                        <div class="add-button-container">
-                            <button class="add-button" id="add-button-4" onclick="addToCart(4)">Add</button>
-                            <span class="price">$190.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="catalog-item" data-item="5">
-                    <img src="/Lipid.png" alt="Item 5">
-                    <div class="content">
-                        <h3>Lipid test</h3>
-                        <span id="recommended-lipid" class="recommended-tag"></span>
-                        <p>Measures cholesterol levels</p>
-                        <button class="view-button" onclick="openModal(5)">View Details</button>
-                        <div class="add-button-container">
-                            <button class="add-button" id="add-button-5" onclick="addToCart(5)">Add</button>
-                            <span class="price">$45.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="catalog-item" data-item="6">
-                    <img src="/MRI.jpg" alt="Item 6">
-                    <div class="content">
-                        <h3>MRI Scan</h3>
-                        <span id="recommended-mri" class="recommended-tag"></span>
-                        <p>Detailed body images.</p>
-                        <button class="view-button" onclick="openModal(6)">View Details</button>
-                        <div class="add-button-container">
-                            <button class="add-button" id="add-button-6" onclick="addToCart(6)">Add</button>
-                            <span class="price">$280.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar for user information -->
-                <div class="sidebar-container">
-                    <!-- Sidebar for user information -->
-                    <div class="sidebar">
-                        <h3>Profile Information</h3>
-                        <p><strong>Name:</strong>
-                            <%= employee.name %>
-                        </p>
-                        <p><strong>Employee ID:</strong>
-                            <%= employee.employee_id %>
-                        </p>
-                        <p><strong>Email:</strong>
-                            <%= employee.email %>
-                        </p>
-                        <p><strong>Phone:</strong>
-                            <%= employee.phone %>
-                        </p>
-                        <p><strong>Company:</strong>
-                            <%= employee.company %>
-                        </p>
-                        <p><strong>Package:</strong>
-                            <%= employee.package %>
-                        </p>
-                    </div>
-
-                    <!-- Sidebar for price information -->
-                    <div class="sidebar-price" id="price-info">
-                        <h3>Price Information</h3>
-                        <p id="selected-items"><strong>Selected Items:</strong> Basic Test Package</p>
-                        <p id="total-price"><strong>Total Price:</strong> $0.00</p>
-                        <button class="proceed-button" id="action-button">Proceed</button>
-                    </div>
-                </div>
+  <%- include('navbar', { employeeID: employeeID, appointment: appointment }) %>
+    <div id="survey-banner">
+      <a href="/survey/<%= employee.employee_id %>" id="survey-link">
+        Unsure on which test to choose? Take a survey.
+      </a>
+      <button id="close-banner">&times;</button>
+    </div>
+    <div class="main-container">
+      <!-- Catalog grid for items -->
+      <div class="catalog-grid">
+        <!-- Six catalog items in a 3x2 grid layout -->
+        <div class="catalog-item" data-item="1">
+          <img src="/basicTest.jpg" alt="Item 1" />
+          <div class="content">
+            <h3>Basic Test package</h3>
+            <p>These tests included are free of charge.</p>
+ 
+            <div class="add-button-container">
+              <button class="view-button" onclick="openModal(1)">
+                View Details
+              </button>
+              <button class="add-button" id="add-button-1" onclick="addToCart(1)" disabled>
+                Add
+              </button>
+              <span class="price">$0.00</span>
             </div>
+          </div>
         </div>
-
-        <!-- Modal popup for each item -->
-        <div class="modal" id="modal">
-            <div class="modal-content">
-                <h2 id="modal-title">Item Title</h2>
-                <p id="modal-description">Item Description</p>
-                <button class="close-modal" onclick="closeModal()">Close</button>
+        <div class="catalog-item" data-item="2">
+          <img src="/KidneyFunction.jpg" alt="Item 2" />
+          <div class="content">
+            <h3>Kidney function test</h3>
+            <span id="recommended-kidney" class="recommended-tag"></span>
+            <p>
+              Evaluates Kidney Function
+            </p>
+ 
+            <div class="add-button-container">
+              <button class="view-button" onclick="openModal(2)">
+                View Details
+              </button>
+              <button class="add-button" id="add-button-2" onclick="addToCart(2)">
+                Add
+              </button>
+              <span class="price">$99.00</span>
             </div>
+          </div>
         </div>
+        <div class="catalog-item" data-item="3">
+          <img src="/HIV.jpg" alt="Item 3" />
+          <div class="content">
+            <h3>HIV test</h3>
+            <span id="recommended-hiv" class="recommended-tag"></span>
+            <p>
+              Checks for HIV
+            </p>
+ 
+            <div class="add-button-container">
+              <button class="view-button" onclick="openModal(3)">
+                View Details
+              </button>
+              <button class="add-button" id="add-button-3" onclick="addToCart(3)">
+                Add
+              </button>
+              <span class="price">$79.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-item" data-item="4">
+          <img src="/electro.jpg" alt="Item 4" />
+          <div class="content">
+            <h3>Electrocardiogram</h3>
+            <span id="recommended-electro" class="recommended-tag"></span>
+            <p>
+              Records heart's electrical activity 
+            </p>
+ 
+            <div class="add-button-container">
+              <button class="view-button" onclick="openModal(4)">
+                View Details
+              </button>
+              <button class="add-button" id="add-button-4" onclick="addToCart(4)">
+                Add
+              </button>
+              <span class="price">$190.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-item" data-item="5">
+          <img src="/Lipid.png" alt="Item 5" />
+          <div class="content">
+            <h3>Lipid test</h3>
+            <span id="recommended-lipid" class="recommended-tag"></span>
+            <p>
+              Measures cholesterol levels
+            </p>
+ 
+            <div class="add-button-container">
+              <button class="view-button" onclick="openModal(5)">
+                View Details
+              </button>
+              <button class="add-button" id="add-button-5" onclick="addToCart(5)">
+                Add
+              </button>
+              <span class="price">$45.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-item" data-item="6">
+          <img src="/MRI.jpg" alt="Item 6" />
+          <div class="content">
+            <h3>MRI Scan</h3>
+            <span id="recommended-mri" class="recommended-tag"></span>
+            <p>
+              Detailed body images
+            </p>
+ 
+            <div class="add-button-container">
+              <button class="view-button" onclick="openModal(6)">
+                View Details
+              </button>
+              <button class="add-button" id="add-button-6" onclick="addToCart(6)">
+                Add
+              </button>
+              <span class="price">$280.00</span>
+            </div>
+          </div>
+        </div>
+ 
+ 
+      </div>
+      <!-- Sidebar for user information -->
+      <div class="sidebar-container">
+        <div>
+          <!-- Sidebar for user information -->
+          <div class="sidebar">
+            <h3>Profile Information</h3>
+            <p>
+              <strong>Name:</strong>
+              <%= employee.name %>
+            </p>
+            <p>
+              <strong>Employee ID:</strong>
+              <%= employee.employee_id %>
+            </p>
+            <p>
+              <strong>Email:</strong>
+              <%= employee.email %>
+            </p>
+            <p>
+              <strong>Phone:</strong>
+              <%= employee.phone %>
+            </p>
+            <p>
+              <strong>Company:</strong>
+              <%= employee.company %>
+            </p>
+            <p>
+              <strong>Package:</strong>
+              <%= employee.package %>
+            </p>
+          </div>
+ 
+          <!-- Sidebar for price information -->
+          <div class="sidebar-price" id="price-info">
+            <h3>Price Information</h3>
+            <p id="selected-items">
+              <strong>Selected Items:</strong> Basic Test Package
+            </p>
+            <p id="total-price"><strong>Total Price:</strong> $0.00</p>
+            <button class="proceed-button" id="action-button">Proceed</button>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Modal popup for each item -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <h2 id="modal-title">Item Title</h2>
+        <p id="modal-description">Item Description</p>
+        <button class="close-modal" onclick="closeModal()">Close</button>
+      </div>
+    </div>
 
         <script>
             const itemDetails = {
@@ -648,6 +695,7 @@
                 localStorage.setItem('hideSurveyBanner', 'true'); // Remember the banner is dismissed
             });
         </script>
+        <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="7010eacc-7d4f-4ec6-b1b4-fd3a79b69d15";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 </body>
 
 </html>
