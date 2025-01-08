@@ -433,6 +433,27 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
     }
 });
 
+app.get('/reschedule-appointment/:employee_id', async (req, res) => {
+    const { employee_id } = req.params;
+
+    try {
+        // Fetch the appointment based on employee_id
+        const appointment = await PatientAppointmentBooking.findOne({ employee_id });
+
+        if (appointment) {
+            // Pass the appointment and employee_id to the EJS template
+            res.render('rescheduleForm', { appointment, employeeID: employee_id });
+        } else {
+            // Handle case where no appointment is found
+            res.send("<h1>No appointment found for this employee ID.</h1>");
+        }
+    } catch (error) {
+        // Log any potential error during the query
+        console.error("Error fetching appointment:", error);
+        res.status(500).send("Server error");
+    }
+});
+
 app.get('/reschedule-form', (req, res) => {
     res.render('rescheduleForm');
 });
