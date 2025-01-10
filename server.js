@@ -338,19 +338,19 @@ app.post('/survey/:employee_id', async (req, res) => {
 app.post('/reschedule-appointment/:employee_id', async (req, res) => {
     const { employee_id } = req.params;
     const { date, time, reason, specialRequests } = req.body;
-
+ 
     try {
         // Log the employee_id to ensure it's being passed correctly
         console.log('Employee ID from URL:', employee_id);
-
+ 
         // Fetch the current appointment for the employee
         const currentAppointment = await PatientAppointmentBooking.findOne({ employee_id });
-
+ 
         if (!currentAppointment) {
             console.log('Appointment not found for employee:', employee_id);
             return res.status(404).send("Appointment not found");
         }
-
+ 
         // Save the previous appointment details
         const previousAppointment = {
             date: currentAppointment.date,
@@ -358,14 +358,41 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
             reason: currentAppointment.reason,
             specialRequests: currentAppointment.specialRequests || "None"
         };
-
+ 
+        // Decrease currentPatients count for the previous time slot
+        let oldTimeSlot = await Appointment.findOne({ date: currentAppointment.date, time: currentAppointment.time });
+        if (oldTimeSlot) {
+            oldTimeSlot.currentPatients = Math.max(0, oldTimeSlot.currentPatients - 1);
+            await oldTimeSlot.save();
+        }
+ 
+        // Check if the new time slot exists and create/update it accordingly
+        let newTimeSlot = await Appointment.findOne({ date, time });
+        if (!newTimeSlot) {
+            const defaultMaxPatients = 5;
+            newTimeSlot = new Appointment({
+                date,
+                time,
+                maxPatients: defaultMaxPatients,
+                currentPatients: 0
+            });
+        }
+ 
+        // Check if there are available slots in the new time slot
+        if (newTimeSlot.currentPatients >= newTimeSlot.maxPatients) {
+            return res.status(400).send("<h1>No available slots for the selected appointment.</h1>");
+        }
+ 
+        newTimeSlot.currentPatients += 1;
+        await newTimeSlot.save();
+ 
         // Update the appointment with new details
         currentAppointment.date = date;
         currentAppointment.time = time;
         currentAppointment.reason = reason;
         currentAppointment.specialRequests = specialRequests;
         await currentAppointment.save();
-
+ 
         // Send updated confirmation email with previous and new details
         const employee = await Employee.findOne({ employee_id: currentAppointment.employee_id });
         if (employee) {
@@ -376,7 +403,7 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                     pass: 'jtaq jhof vvro eldm',
                 },
             });
-
+ 
             const mailOptions = {
                 from: 'corphassg@gmail.com',
                 to: employee.email,
@@ -402,10 +429,10 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                     <p>Thank you for using our service.</p>
                 `,
             };
-
+ 
             await transporter.sendMail(mailOptions);
         }
-
+ 
         // Send response confirming the reschedule
         res.send(`
             <h1>Appointment rescheduled successfully!</h1>
@@ -425,9 +452,8 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
             </ul>
             <a href="/check-employee-profile/${currentAppointment.employee_id}">Back to Home</a>
         `);
-
-
-} catch (error) {
+ 
+    } catch (error) {
         console.error('Error:', error.stack);
         res.status(500).send(`Server error while rescheduling appointment: ${error.message}`);
     }
