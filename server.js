@@ -257,12 +257,54 @@ app.post('/book-appointment', async (req, res) => {
         }
 
         res.send(` 
-            <h1>Appointment booked successfully!</h1> 
-            <p>Date: ${parsedDate.toDateString()}</p> 
-            <p>Time: ${time}</p> 
-            <p>Reason for Visit: ${reason}</p> 
-            <p>Special Requests: ${specialRequests}</p> 
-            <a href="/check-employee-profile/${employee_id}">Back to Home</a> 
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Appointment Rescheduled</title>
+                <style>
+                    body {
+                        font-family: 'Lora', serif; 
+                        height: 100vh;
+                        margin: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        background-color: #aad9d8;
+                        color: #fff;
+                        text-align: center;
+                    }
+                    .container {
+                        background-color: rgba(236, 239, 241, 0.9);
+                        padding: 30px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                        width: 80%;
+                        max-width: 500px;
+                    }
+                    h1 {
+                        color: #005A9C;
+                        margin-bottom: 20px;
+                    }
+                    p {
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                        color: #333;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Appointment booked successfully!</h1> 
+                    <p>Date: ${parsedDate.toDateString()}</p> 
+                    <p>Time: ${time}</p> 
+                    <p>Reason for Visit: ${reason}</p> 
+                    <p>Special Requests: ${specialRequests}</p> 
+                    <a href="/check-employee-profile/${employee_id}">Back to Home</a> 
+                </div>
+            </body>
+            </html>
         `);
     } catch (error) {
         console.error("Error:", error.stack);
@@ -435,22 +477,60 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
  
         // Send response confirming the reschedule
         res.send(`
-            <h1>Appointment rescheduled successfully!</h1>
-            <p><strong>Previous Details:</strong></p>
-            <ul>
-                <li>Date: ${new Date(previousAppointment.date).toDateString()}</li>
-                <li>Time: ${previousAppointment.time}</li>
-                <li>Reason: ${previousAppointment.reason}</li>
-                <li>Special Requests: ${previousAppointment.specialRequests}</li>
-            </ul>
-            <p><strong>New Details:</strong></p>
-            <ul>
-                <li>Date: ${new Date(date).toDateString()}</li>
-                <li>Time: ${time}</li>
-                <li>Reason: ${reason}</li>
-                <li>Special Requests: ${specialRequests}</li>
-            </ul>
-            <a href="/check-employee-profile/${currentAppointment.employee_id}">Back to Home</a>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Appointment Rescheduled</title>
+                <style>
+                    body {
+                        font-family: 'Lora', serif; 
+                        height: 100vh;
+                        margin: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        background-color: #aad9d8;
+                        color: #fff;
+                        text-align: center;
+                    }
+                    .container {
+                        background-color: rgba(236, 239, 241, 0.9);
+                        padding: 30px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                        width: 80%;
+                        max-width: 500px;
+                    }
+                    h1 {
+                        color: #005A9C;
+                        margin-bottom: 20px;
+                    }
+                    p {
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                        color: #333;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Appointment rescheduled successfully!</h1>
+                    <p><strong>Previous Details:</strong></p>
+                    <p>Date: ${new Date(previousAppointment.date).toDateString()}</p>
+                    <p>Time: ${previousAppointment.time}</p>
+                    <p>Reason: ${previousAppointment.reason}</p>
+                    <p>Special Requests: ${previousAppointment.specialRequests}</p>
+                    <p><strong>New Details:</strong></p>
+                    <p>Date: ${new Date(date).toDateString()}</p>
+                    <p>Time: ${time}</p>
+                    <p>Reason: ${reason}</p>
+                    <p>Special Requests: ${specialRequests}</p>
+                    <a href="/check-employee-profile/${currentAppointment.employee_id}">Back to Home</a>
+                </div>
+            </body>
+            </html>
         `);
  
     } catch (error) {
