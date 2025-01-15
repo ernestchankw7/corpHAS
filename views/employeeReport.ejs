@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Details</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: 'Lora' !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: url('/backgroundImg5.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+
+
+    <!-- <link rel="stylesheet" href="/css/emp-details.css"> -->
+</head>
+
+<body>
+    <%- include('navbar', { employeeID: employeeID, appointment: appointment }) %>
+
+</body>
+
+</html>
