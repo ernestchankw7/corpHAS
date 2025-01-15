@@ -182,20 +182,18 @@ app.get('/booking-form/:employeeID', async (req, res) => {
 // Handle appointment booking submission 
 app.post('/book-appointment', async (req, res) => {
     const { employee_id, date, time, reason, specialRequests } = req.body;
-
+ 
     try {
         const parsedDate = new Date(date);
         if (isNaN(parsedDate)) {
             throw new Error("Invalid date format");
         }
-
-        // Check if the employee has already booked an appointment on the same date 
+ 
         const existingBooking = await PatientAppointmentBooking.findOne({ employee_id, date: parsedDate });
         if (existingBooking) {
             return res.status(400).send(`<h1>You have already booked an appointment on this date.</h1><a href="/check-employee-profile/${employee_id}">Back to Home</a>`);
         }
-
-        // Find or create an appointment slot 
+ 
         let appointment = await Appointment.findOne({ date: parsedDate, time });
         if (!appointment) {
             const defaultMaxPatients = 5;
@@ -207,13 +205,12 @@ app.post('/book-appointment', async (req, res) => {
             });
             await appointment.save();
         }
-
-        // Check if there are available slots 
+ 
+        // Check if the slot is already full
         if (appointment.currentPatients >= appointment.maxPatients) {
             return res.status(400).send("<h1>No available slots for this appointment.</h1>");
         }
-
-        // Save the appointment for the employee 
+ 
         const patientAppointment = new PatientAppointmentBooking({
             employee_id,
             date: parsedDate,
@@ -221,19 +218,39 @@ app.post('/book-appointment', async (req, res) => {
             reason,
             specialRequests,
         });
-
+ 
         await patientAppointment.save();
-
-        // Update the current patient count for the appointment slot 
         appointment.currentPatients += 1;
         await appointment.save();
-
-        // Fetch employee details for email
+ 
+        // Send email when exactly 5 patients have booked
+        if (appointment.currentPatients === appointment.maxPatients) {
+            const mailOptions = {
+                from: 'corphassg@gmail.com',
+                to: 'parkwaypantaisg@gmail.com',
+                subject: 'Appointment Slot Full Notification',
+                html: `
+                    <h1>Appointment Slot Full Notification</h1>
+                    <p>Dear Admin,</p>
+                    <p>The following appointment slot has reached its maximum capacity:</p>
+                    <ul>
+                        <li>Date: ${parsedDate.toDateString()}</li>
+                        <li>Time: ${time}</li>
+                        <li>Current Patient Count: ${appointment.maxPatients}</li>
+                    </ul>
+                    <p>Please make the necessary arrangements. Thank you!</p>
+                `,
+            };
+ 
+            await transporter.sendMail(mailOptions)
+                .then(info => console.log('Email sent successfully:', info.response))
+                .catch(error => console.error('Error sending email:', error));
+        }
+ 
         const employee = await Employee.findOne({ employee_id });
         if (employee) {
-            // Email options
             const mailOptions = {
-                from: 'corphassg@gmail.com', // Replace with your email
+                from: 'corphassg@gmail.com',
                 to: employee.email,
                 subject: 'Appointment Confirmation',
                 html: `
@@ -250,8 +267,7 @@ app.post('/book-appointment', async (req, res) => {
                     <p>Thank you for using our service.</p>
                 `,
             };
-
-            // Send email
+ 
             await transporter.sendMail(mailOptions);
             console.log('Confirmation email sent to:', employee.email);
         }
@@ -427,6 +443,30 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
  
         newTimeSlot.currentPatients += 1;
         await newTimeSlot.save();
+ 
+        // Send email when the new time slot becomes full
+        if (newTimeSlot.currentPatients === newTimeSlot.maxPatients) {
+            const mailOptions = {
+                from: 'corphassg@gmail.com',
+                to: 'parkwaypantaisg@gmail.com',
+                subject: 'Appointment Slot Full Notification',
+                html: `
+                    <h1>Appointment Slot Full Notification</h1>
+                    <p>Dear Admin,</p>
+                    <p>The following appointment slot has reached its maximum capacity:</p>
+                    <ul>
+                        <li>Date: ${new Date(date).toDateString()}</li>
+                        <li>Time: ${time}</li>
+                        <li>Current Patient Count: ${newTimeSlot.maxPatients}</li>
+                    </ul>
+                    <p>Please make the necessary arrangements. Thank you!</p>
+                `,
+            };
+ 
+            await transporter.sendMail(mailOptions)
+                .then(info => console.log('Email sent successfully:', info.response))
+                .catch(error => console.error('Error sending email:', error));
+        }
  
         // Update the appointment with new details
         currentAppointment.date = date;
