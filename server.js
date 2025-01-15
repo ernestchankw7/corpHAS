@@ -593,16 +593,21 @@ app.get('/employee-report/:employeeID', async (req, res) => {
     const { employeeID } = req.params;
 
     try {
+        // Fetch the employee data
         const employee = await Employee.findOne({ employee_id: employeeID });
 
+        // Fetch the latest appointment data
+        const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
+
         if (employee) {
-            res.render('employeeReport', { employee });
+            // Pass both employee and appointment to the template
+            res.render('employeeReport', { employee, appointment, employeeID });
         } else {
-            res.status(404).send('<h1>Employee not found.</h1>');
+            res.send("<h1>Employee ID not found.</h1>");
         }
     } catch (error) {
-        console.error('Error fetching employee report:', error);
-        res.status(500).send('Internal Server Error');
+        console.error('Error fetching data:', error);
+        res.status(500).send("Server error");
     }
 });
 
