@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
             margin: 0;
             padding: 20px;
         }
-
+ 
         .summary-container {
             max-width: 600px;
             margin: 0 auto;
@@ -21,30 +21,30 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
+ 
         .summary-title {
             font-size: 1.5em;
             margin-bottom: 20px;
             text-align: center;
         }
-
+ 
         .item-row {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid #ddd;
         }
-
+ 
         .item-row:last-child {
             border-bottom: none;
         }
-
+ 
         .total-row {
             margin-top: 20px;
             font-size: 1.2em;
             font-weight: bold;
         }
-
+ 
         .back-button {
             margin-top: 20px;
             display: block;
@@ -55,12 +55,12 @@
             text-decoration: none;
             border-radius: 4px;
         }
-
+ 
         #paypal-container-X3HPGWDCVPBK2 {
             margin-top: 30px;
             text-align: center;
         }
-
+ 
         .paypal-center {
             display: flex;
             justify-content: center;
@@ -68,7 +68,7 @@
         }
     </style>
 </head>
-
+ 
 <body>
     <div class="summary-container">
         <h1 class="summary-title">Order Summary</h1>
@@ -90,89 +90,115 @@
         <p><strong>Package:</strong>
             <%= employee.package %>
         </p>
-
+ 
         <div id="cart-summary"></div>
-
-        <div id="paypal-container-X3HPGWDCVPBK2" class="paypal-center"></div>
-
+ 
+        <div id="paypal-button-container"></div>
+ 
         <a href="/add-ons/<%= employee.employee_id %>" class="back-button">Back</a>
     </div>
-
+ 
     <!-- PayPal SDK -->
     <script
-        src="https://www.paypal.com/sdk/js?client-id=BAAmASv2z_C1UJ3yhvaFIyAL8Y1T37WF8ocXNHMAvQPoIEbHJb8POcawx2XHbhNXDghhLSmMLS-kxBH3q4&components=hosted-buttons&currency=SGD&disable-funding=venmo"></script>
+        src="https://www.paypal.com/sdk/js?client-id=AQ3UjkyxHHlfjOdVDILyH7lJwauWKNgfaUaTTmZnnZt2dgDAJoSP28d8Y76YyOIzCbiJ62M_ITC8a1X3&currency=SGD&disable-funding=venmo"></script>
+ 
     <script>
         // Retrieve cartSummary from localStorage
-        const cartSummary = JSON.parse(localStorage.getItem('cartSummary'));
-
-        if (cartSummary) {
-            const summaryContainer = document.getElementById('cart-summary');
-            summaryContainer.innerHTML = ''; // Clear loading message
-
+        const cartSummary = JSON.parse(localStorage.getItem("cartSummary"));
+ 
+        console.log("Cart Summary:", cartSummary);
+ 
+        // Check if cartSummary exists
+        const summaryContainer = document.getElementById("cart-summary");
+        if (cartSummary && cartSummary.items && cartSummary.items.length > 0) {
+            summaryContainer.innerHTML = ""; // Clear loading message
+ 
             // Display each item
-            cartSummary.items.forEach(item => {
-                if (item && item.title) { // Ensure valid item
-                    const itemRow = document.createElement('div');
-                    itemRow.className = 'item-row';
-
+            cartSummary.items.forEach((item) => {
+                if (item && item.title) {
+                    const itemRow = document.createElement("div");
+                    itemRow.className = "item-row";
+ 
                     // Create title span
-                    const titleSpan = document.createElement('span');
+                    const titleSpan = document.createElement("span");
                     titleSpan.textContent = item.title;
-
+ 
                     // Create price span
-                    const priceSpan = document.createElement('span');
+                    const priceSpan = document.createElement("span");
                     priceSpan.textContent = `$${item.price.toFixed(2)}`;
-
+ 
                     // Append spans to itemRow
                     itemRow.appendChild(titleSpan);
                     itemRow.appendChild(priceSpan);
                     summaryContainer.appendChild(itemRow);
                 }
             });
-
+ 
             // Display total price
-            const totalRow = document.createElement('div');
-            totalRow.className = 'total-row';
-
-            const totalLabel = document.createElement('strong');
-            totalLabel.textContent = 'Total:';
-
+            const totalRow = document.createElement("div");
+            totalRow.className = "total-row";
+ 
+            const totalLabel = document.createElement("strong");
+            totalLabel.textContent = "Total:";
+ 
             const totalValue = document.createTextNode(` $${cartSummary.totalPrice.toFixed(2)}`);
-
+ 
             totalRow.appendChild(totalLabel);
             totalRow.appendChild(totalValue);
             summaryContainer.appendChild(totalRow);
-
+ 
+            // Render PayPal button if total price > $0
             if (cartSummary.totalPrice > 0) {
-                paypal.HostedButtons({
-                    hostedButtonId: "X3HPGWDCVPBK2",
-                }).render("#paypal-container-X3HPGWDCVPBK2");
+                paypal.Buttons({
+                    createOrder: function (data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: cartSummary.totalPrice.toFixed(2)
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: function (data, actions) {
+                        return actions.order.capture().then(function (details) {
+                            handlePaymentSuccess(details, cartSummary);  // Send payment data to the backend
+                        });
+                    }
+                }).render("#paypal-button-container");
             } else {
-                const paypalContainer = document.getElementById('paypal-container-X3HPGWDCVPBK2');
-                paypalContainer.innerHTML = '<p>Payment not required for Basic Test Package.</p>';
+                const paypalContainer = document.getElementById("paypal-container-X3HPGWDCVPBK2");
+                paypalContainer.innerHTML = "<p>Payment not required for Basic Test Package.</p>";
             }
         } else {
-            const summaryContainer = document.getElementById('cart-summary');
-            summaryContainer.innerHTML = '<p>No items in the cart.</p>';
+            summaryContainer.innerHTML = "<p>No items in the cart.</p>";
         }
-
-        // temp proceed script**
-        document.getElementById('proceed-form').addEventListener('submit', function (e) {
-            // Prevent default form submission to process the items dynamically
-            const items = [];
-            document.querySelectorAll('#cart-summary .item-row').forEach(row => {
-                const title = row.querySelector('span:nth-child(1)').textContent.trim();
-                const price = parseFloat(row.querySelector('span:nth-child(2)').textContent.replace('$', '').trim());
-                if (title && !isNaN(price)) {
-                    items.push({ title, price });
-                }
-            });
-
-            // Add the items to the hidden input
-            document.getElementById('items-input').value = JSON.stringify(items);
-        });
-
+ 
+        // This is an example of sending data to your server after a successful payment
+        function handlePaymentSuccess(details, cartSummary) {
+            console.log("Payment success details:", details);
+            console.log("APPROVED!")
+            const employeeID = '<%= employee.employee_id %>';
+            // Call API to save items
+            fetch("https://obscure-plateau-48204-0c5bc03f33b6.herokuapp.com/test-items/save/"+employeeID,
+            {
+                method: "POST",
+                body: JSON
+                .stringify
+                ({
+                details: details,
+                cartSummary: cartSummary,
+                }),
+                headers: {
+                "Content-type": "application/json",
+                },
+            })
+                .then((response) => response.json())
+                .then((json) => console.log(json));
+            // Redirect back to add-ons page
+            localStorage.removeItem('cart');
+            window.location.href = `/add-ons/${employeeID}`;
+        }
     </script>
 </body>
-
+ 
 </html>

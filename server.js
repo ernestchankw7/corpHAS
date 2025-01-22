@@ -10,6 +10,14 @@ const port = process.env.PORT || 2000;
 const app = express();
 app.use(express.urlencoded({ extended: true }))
 
+var bodyParser = require('body-parser');
+ 
+// configure the app to use bodyParser()
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -28,6 +36,12 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, 'LoginPage.html'))
 })
 
+const TestItemsSchema = new mongoose.Schema({
+    employee_id: String,
+    items: Array,
+});
+
+const TestItem = mongoose.model('TestItems', TestItemsSchema)
 
 const appointmentSchema = new mongoose.Schema({
     date: { type: Date, required: true },
@@ -648,6 +662,37 @@ app.get('/employee-report/:employeeID', async (req, res) => {
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send("Server error");
+    }
+});
+
+// Handle saving the test items
+app.post('/test-items/save/:employee_id', async (req, res) => {
+    const { employee_id } = req.params;
+    const { details, cartSummary } = req.body;
+    const items = []
+    cartSummary.items.forEach((item) => {
+        items.push(item)
+    })
+    try {
+        // Log the employee_id to ensure it's being passed correctly
+        console.log('Employee ID from URL:', employee_id);
+        console.log('CartSummary:', cartSummary);
+        console.log('Items:', items)
+ 
+         // Save new test item
+         const testItem = new TestItem({
+            employee_id,
+            items,
+        });
+ 
+        await testItem.save();
+ 
+        // Return a 200 response to mark success
+        res.sendStatus(200);
+ 
+    } catch (error) {
+        console.error('Error:', error.stack);
+        res.status(500).send(`Server error while saving items: ${error.message}`);
     }
 });
 
