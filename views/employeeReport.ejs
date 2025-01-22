@@ -4,29 +4,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Details</title>
+    <title>Employee Report</title>
     <style>
-        /* Add your CSS styling here */
         body {
-            font-family: 'Lora' !important;
+            font-family: 'Lora', serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: url('/backgroundImg5.jpg');
-            background-size: cover;
-            background-position: center;
+            background: url('/backgroundImg5.jpg') no-repeat center center / cover;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .test-items {
+            margin-top: 20px;
+        }
+
+        .test-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
         }
     </style>
-
-
-    <!-- <link rel="stylesheet" href="/css/emp-details.css"> -->
 </head>
 
 <body>
     <%- include('navbar', { employeeID: employeeID, appointment: appointment }) %>
+    <div class="container">
+        <h1>Employee Report</h1>
 
+        <% if (testItems && testItems.items && testItems.items.length > 0) { %>
+        <div class="test-items">
+            <h2>Test Items</h2>
+            <% testItems.items.forEach(item => { %>
+            <div class="test-item">
+                <p><%= item.title %></p>
+            </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <p>No test items available for this employee.</p>
+        <% } %>
+
+        <a href="/add-ons/<%= employee.employee_id %>">Back to Add-Ons</a>
+    </div>
 </body>
 
 </html>

@@ -653,9 +653,12 @@ app.get('/employee-report/:employeeID', async (req, res) => {
         // Fetch the latest appointment data
         const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
 
+        // Fetch the test items for the employee
+        const testItems = await TestItem.findOne({ employee_id: employeeID });
+
         if (employee) {
-            // Pass both employee and appointment to the template
-            res.render('employeeReport', { employee, appointment, employeeID });
+            // Pass the employee, appointment, testItems, and employeeID to the template
+            res.render('employeeReport', { employee, appointment, testItems, employeeID });
         } else {
             res.send("<h1>Employee ID not found.</h1>");
         }
