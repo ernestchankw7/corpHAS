@@ -669,27 +669,40 @@ app.get('/employee-report/:employeeID', async (req, res) => {
 app.post('/test-items/save/:employee_id', async (req, res) => {
     const { employee_id } = req.params;
     const { details, cartSummary } = req.body;
-    const items = []
-    cartSummary.items.forEach((item) => {
-        items.push(item)
-    })
+    const items = cartSummary.items; // Directly use the items from cartSummary
+ 
     try {
-        // Log the employee_id to ensure it's being passed correctly
+        // Log the incoming data for debugging
         console.log('Employee ID from URL:', employee_id);
         console.log('CartSummary:', cartSummary);
-        console.log('Items:', items)
  
-         // Save new test item
-         const testItem = new TestItem({
-            employee_id,
-            items,
-        });
+        // Check if a record already exists for this employee_id
+        const existingRecord = await TestItem.findOne({ employee_id });
  
-        await testItem.save();
+        if (existingRecord) {
+            // Filter out duplicate items
+            const existingItemSet = new Set(existingRecord.items.map(item => JSON.stringify(item)));
+            const uniqueNewItems = items.filter(item => !existingItemSet.has(JSON.stringify(item)));
+ 
+            if (uniqueNewItems.length > 0) {
+                existingRecord.items.push(...uniqueNewItems); // Append only unique items
+                await existingRecord.save();
+                console.log(`Updated items for employee_id: ${employee_id}`);
+            } else {
+                console.log(`No new unique items to add for employee_id: ${employee_id}`);
+            }
+        } else {
+            // If no record exists, create a new one
+            const testItem = new TestItem({
+                employee_id,
+                items,
+            });
+            await testItem.save();
+            console.log(`Created new record for employee_id: ${employee_id}`);
+        }
  
         // Return a 200 response to mark success
         res.sendStatus(200);
- 
     } catch (error) {
         console.error('Error:', error.stack);
         res.status(500).send(`Server error while saving items: ${error.message}`);
