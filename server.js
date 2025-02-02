@@ -50,6 +50,8 @@ const appointmentSchema = new mongoose.Schema({
     currentPatients: { type: Number, default: 0 }, // Current number of booked patients
 });
 
+const TestResult = mongoose.model('TestResult', new mongoose.Schema({}, { strict: false })); // Flexible schema
+
 // Create Model
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
