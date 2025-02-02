@@ -618,30 +618,6 @@ app.get('/reschedule-form', (req, res) => {
     res.render('rescheduleForm');
 });
 
-
-// Route to handle "Proceed" button**
-app.post('/proceed', async (req, res) => {
-    const { employeeID, items } = req.body;
-
-    try {
-        // Parse the items string into an array
-        const parsedItems = JSON.parse(items);
-
-        // Save the test items along with the employee ID
-        const newTestItem = new TestItem({
-            employeeID,
-            items: parsedItems
-        });
-        await newTestItem.save();
-
-        // Redirect back to employeeDetails.ejs with the employee ID
-        res.redirect(`/check-employee-profile/${employeeID}`);
-    } catch (error) {
-        console.error('Error saving test items:', error);
-        res.status(500).send('Error saving test items.');
-    }
-});
-
 // Route to handle "report" navbar
 app.get('/employee-report/:employeeID', async (req, res) => {
     const { employeeID } = req.params;
@@ -656,15 +632,166 @@ app.get('/employee-report/:employeeID', async (req, res) => {
         // Fetch the test items for the employee
         const testItems = await TestItem.findOne({ employee_id: employeeID });
 
-        if (employee) {
-            // Pass the employee, appointment, testItems, and employeeID to the template
-            res.render('employeeReport', { employee, appointment, testItems, employeeID });
-        } else {
-            res.send("<h1>Employee ID not found.</h1>");
+        // Fetch the test results for the given employee ID
+        const testResult = await TestResult.findOne({ employeeId: employeeID });
+
+        // Process and clean the data
+        const processedResults = {
+            counterResults: [],
+            addOnCounters: [],
+        };
+
+        // If test results exist, process them
+        if (testResult) {
+            // Process counterResults
+            if (testResult.counterResults) {
+                for (const [counter, details] of Object.entries(testResult.counterResults)) {
+                    processedResults.counterResults.push({
+                        testName: details.testName,
+                        result: details.result,
+                    });
+                }
+            }
+
+            // Process addOnCounters
+            if (testResult.addOnCounters) {
+                testResult.addOnCounters.forEach((counter) => {
+                    const { testName, tests } = counter;
+                    const results = tests.map(test => ({
+                        testName: test.testName,
+                        result: test.result,
+                    }));
+
+                    processedResults.addOnCounters.push({
+                        testName,
+                        results,
+                    });
+                });
+            }
         }
+
+        // Render the template with all fetched and processed data
+        res.render('employeeReport', { 
+            employee, 
+            appointment, 
+            testItems, 
+            employeeID, 
+            processedResults 
+        });
+
     } catch (error) {
         console.error('Error fetching data:', error);
-        res.status(500).send("Server error");
+        res.status(500).send('Server error');
+    }
+});
+
+// Route to generate PDF dynamically
+app.post('/generate-pdf/:employeeID', async (req, res) => {
+    const { employeeID } = req.params;
+
+    try {
+        // Fetch the required data
+        const employee = await Employee.findOne({ employee_id: employeeID });
+        const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
+        const testResult = await TestResult.findOne({ employeeId: employeeID });
+
+        // Process results
+        const processedResults = {
+            counterResults: [],
+            addOnCounters: [],
+        };
+
+        if (testResult) {
+            if (testResult.counterResults) {
+                for (const [counter, details] of Object.entries(testResult.counterResults)) {
+                    processedResults.counterResults.push({
+                        testName: details.testName,
+                        result: details.result || 'Pending Result',
+                    });
+                }
+            }
+
+            if (testResult.addOnCounters) {
+                testResult.addOnCounters.forEach(counter => {
+                    const { testName, tests } = counter;
+                    const results = tests.map(test => ({
+                        testName: test.testName || 'Subtest Name',
+                        result: test.result || 'Pending Result',
+                    }));
+
+                    processedResults.addOnCounters.push({
+                        testName,
+                        results,
+                    });
+                });
+            }
+        }
+
+        // Create a new PDF document
+        const doc = new PDFDocument();
+        const filename = `Employee_TestResult_Report_${employeeID}.pdf`;
+
+        // Set headers for file download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+        // Pipe the PDF to the response
+        doc.pipe(res);
+
+        // Add PDF content
+        doc.fontSize(16).text('Employee Test Report', { align: 'center' });
+        doc.fontSize(12).moveDown();
+        doc.text(`Employee ID: ${employee.employee_id}`);
+        doc.text(`Name: ${employee.name}`);
+        doc.text(`Email: ${employee.email}`);
+        doc.text(`Phone: ${employee.phone}`);
+        doc.text(`Company: ${employee.company}`);
+        doc.text(`Package: ${employee.package}`);
+        doc.moveDown();
+
+        if (appointment) {
+            doc.text(`Last Appointment: ${appointment.date.toDateString()} at ${appointment.time}`);
+        } else {
+            doc.text('No appointment details available.');
+        }
+
+        doc.moveDown().text('Test Results:', { underline: true });
+        if (processedResults.counterResults.length > 0) {
+            processedResults.counterResults.forEach(result => {
+                doc.moveDown().text(`Test Name: ${result.testName}`);
+                Object.entries(result.result).forEach(([key, value]) => {
+                    doc.text(`${key}: ${value}`);
+                });
+            });
+        } else {
+            doc.text('No Standard Test Results Available.');
+        }
+
+        if (processedResults.addOnCounters.length > 0) {
+            doc.moveDown().text('Additional Tests:', { underline: true });
+            processedResults.addOnCounters.forEach(counter => {
+                doc.moveDown().text(`Test Name: ${counter.testName}`);
+                
+                if (counter.results.length > 0) {
+                    counter.results.forEach(test => {
+                        const resultValue = (test.result === null || test.result === undefined || test.result === "") 
+                            ? "null" 
+                            : test.result;
+                        doc.text(`${test.testName}: ${resultValue}`);
+                    });
+                } else {
+                    doc.text("Result: null"); // Ensures "null" is displayed when there are no results
+                }
+            });
+        } else {
+            doc.text('No Additional Test Results Available.');
+        }
+
+        // End the PDF document
+        doc.end();
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).send('Server error while generating PDF.');
     }
 });
 

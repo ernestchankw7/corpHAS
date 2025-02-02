@@ -7,13 +7,14 @@
     <title>Employee Report</title>
     <style>
         body {
-            font-family: 'Lora', serif;
+            font-family: 'Lora';
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             background: url('/backgroundImg5.jpg') no-repeat center center / cover;
+            padding: 10px;
         }
 
         .container {
@@ -23,25 +24,69 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             max-width: 800px;
             width: 100%;
+            margin-top: 60px;
         }
 
         h1 {
-            font-size: 1.5em;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
             margin-bottom: 20px;
             text-align: center;
         }
 
-        .test-items {
+        .section {
             margin-top: 20px;
         }
 
-        .test-item {
+        .section h2 {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #333;
+        }
+
+        .result-item {
             border-bottom: 1px solid #ddd;
             padding: 10px 0;
         }
 
-        .test-item:last-child {
+        .result-item:last-child {
             border-bottom: none;
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+
+        .refresh-button {
+            background: #005A9C;
+            font-family: 'Lora';
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .refresh-button:hover {
+            background: #0072B2;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin-top: 80px;
+            }
+
+            .result-item {
+                padding: 8px 0;
+            }
+
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -49,23 +94,74 @@
 <body>
     <%- include('navbar', { employeeID: employeeID, appointment: appointment }) %>
     <div class="container">
-        <h1>Employee Report</h1>
+        <h1>Employee Test Report</h1>
+        <p>Employee ID: <strong><%= employeeID %></strong></p>
 
-        <% if (testItems && testItems.items && testItems.items.length > 0) { %>
-        <div class="test-items">
-            <h2>Test Items</h2>
-            <% testItems.items.forEach(item => { %>
-            <div class="test-item">
-                <p><%= item.title %></p>
+        <!-- Button Container for Responsive Layout -->
+        
+        <button class="refresh-button" onclick="window.location.reload();">
+            Refresh Report
+        </button>
+        <button id="generate-pdf" class="refresh-button" onclick="generatePDF()">Generate PDF</button>
+        
+
+        <% if (processedResults.counterResults.length > 0) { %>
+        <div class="section">
+            <h2>Standard Tests</h2>
+            <% processedResults.counterResults.forEach(result => { %>
+                <div class="result-item">
+                    <p><strong>Test Name:</strong> <%= result.testName %></p>
+                    <% Object.entries(result.result).forEach(([key, value]) => { %>
+                        <p><strong><%= key %>:</strong> <%= value || 'Pending Result' %></p>
+                    <% }) %>
+                </div>
+            <% }); %>                
+        </div>
+        <% } %>
+
+        <% if (processedResults.addOnCounters.length > 0) { %>
+        <div class="section">
+            <h2>Additional Tests</h2>
+            <% processedResults.addOnCounters.forEach(counter => { %>
+            <div class="result-item">
+                <p><strong>Test Name:</strong> <%= counter.testName || 'No Name Provided' %></p>
+                <% if (counter.results && counter.results.length > 0) { %>
+                    <% counter.results.forEach(test => { %>
+                        <p><strong><%= test.testName || 'Subtest Name' %>:</strong> <%= test.result || 'Pending Result' %></p>
+                    <% }); %>
+                <% } else { %>
+                    <p>Pending Result</p>
+                <% } %>
             </div>
             <% }); %>
         </div>
-        <% } else { %>
-        <p>No test items available for this employee.</p>
         <% } %>
 
-        <a href="/add-ons/<%= employee.employee_id %>">Back to Add-Ons</a>
+        <% if (processedResults.counterResults.length === 0 && processedResults.addOnCounters.length === 0) { %>
+        <p>No test results available for this employee.</p>
+        <% } %>
     </div>
+
+    <script>
+        async function generatePDF() {
+            const response = await fetch(`/generate-pdf/<%= employeeID %>`, {
+                method: 'POST',
+            });
+    
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Employee_TestResult_Report_<%= employeeID %>.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else {
+                alert('Failed to generate PDF. Please try again.');
+            }
+        }
+    </script>
 </body>
 
 </html>
