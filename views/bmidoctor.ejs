@@ -14,7 +14,7 @@
         }
 
         body {
-            height: 110vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,27 +25,25 @@
         }
 
         .container {
-            width: 60%;
+            width: 90%;
             max-width: 600px;
-            background-color: rgba(236, 239, 241, 0.9);
-            padding: 80px 80px;
+            background-color: rgba(236, 239, 241, 0.95);
+            padding: 60px;
             border-radius: 10px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            margin-top: 60px;
         }
 
         .container h1 {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             color: #005A9C;
             margin-bottom: 20px;
             text-align: center;
-            position: relative;
         }
 
         .input-box {
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .input-box label {
@@ -57,9 +55,9 @@
 
         select, input[type="date"], input[type="time"] {
             width: 100%;
-            height: 50px;
+            height: 45px;
             font-size: 16px;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             border: 1px solid #ccc;
             transition: all 0.3s ease;
@@ -72,7 +70,7 @@
 
         button {
             width: 100%;
-            height: 55px;
+            height: 50px;
             background: linear-gradient(135deg, #005A9C, #0072B2);
             color: #fff;
             border: none;
@@ -86,6 +84,48 @@
         button:hover {
             background: linear-gradient(-135deg, #0072B2, #005A9C);
             box-shadow: 0 4px 10px rgba(0, 90, 156, 0.2);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 30px;
+            }
+
+            .container h1 {
+                font-size: 22px;
+            }
+
+            select, input {
+                height: 40px;
+                font-size: 14px;
+            }
+
+            button {
+                height: 45px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .container h1 {
+                font-size: 20px;
+            }
+
+            select, input {
+                height: 38px;
+                font-size: 14px;
+            }
+
+            button {
+                height: 42px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -120,7 +160,6 @@
         
             <button type="submit">Book Appointment</button>
         </form>
-        
     </div>
 
     <script>
