@@ -841,6 +841,76 @@ app.post('/test-items/save/:employee_id', async (req, res) => {
     }
 });
 
+app.get('/bmidoctor/:employeeID', async (req, res) => {
+    const { employeeID } = req.params;
+    
+    try {
+        const employee = await Employee.findOne({ employee_id: employeeID });
+        if (!employee) {
+            return res.status(404).send('Employee not found.');
+        }
+        
+        res.render('bmidoctor', { employee, employeeID }); // Ensure employeeID is passed
+    } catch (error) {
+        console.error('Error fetching employee:', error);
+        res.status(500).send('Server error.');
+    }
+});
+
+app.post('/book-doctor-appointment', async (req, res) => {
+    const { employee_id, clinic, date, time } = req.body;
+
+    try {
+        // Check if the employee exists
+        const employee = await Employee.findOne({ employee_id });
+        if (!employee) {
+            return res.status(404).send("<h1>Employee not found.</h1>");
+        }
+
+        // Email content
+        const mailOptions = {
+            from: 'corphassg@gmail.com',
+            to: employee.email,
+            subject: 'Doctor Appointment Confirmation',
+            html: `
+                <h1>Doctor Appointment Confirmed</h1>
+                <p>Dear ${employee.name},</p>
+                <p>Your doctor appointment has been successfully booked.</p>
+                <p><strong>Details:</strong></p>
+                <ul>
+                    <li><strong>Clinic:</strong> ${clinic}</li>
+                    <li><strong>Date:</strong> ${new Date(date).toDateString()}</li>
+                    <li><strong>Time:</strong> ${time}</li>
+                </ul>
+                <p>Please be on time for your appointment. Thank you.</p>
+            `,
+        };
+
+        // Send confirmation email
+        await transporter.sendMail(mailOptions);
+
+        console.log('Doctor appointment email sent to:', employee.email);
+
+        // Redirect to employee report page
+        // res.redirect(`/employee-report/${employee_id}`);
+        res.send(`
+            <script>
+                alert("Appointment booked successfully!");
+                if (window.opener) {
+                    window.opener.location.href = "/employee-report/${employee_id}"; // Refresh parent
+                    window.close(); // Close tab
+                } else {
+                    window.location.href = "/employee-report/${employee_id}"; // If no parent, redirect
+                }
+            </script>
+        `);
+
+    } catch (error) {
+        console.error("Error:", error.stack);
+        res.status(500).send(`Server error while booking doctor appointment: ${error.message}`);
+    }
+});
+
 app.listen(port, () => {
     console.log("server started")
 })

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Doctor Consultation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Lora', serif;
+        }
+
+        body {
+            height: 110vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            background: url('/backgroundImg5.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+
+        .container {
+            width: 60%;
+            max-width: 600px;
+            background-color: rgba(236, 239, 241, 0.9);
+            padding: 80px 80px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-top: 60px;
+        }
+
+        .container h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #005A9C;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .input-box {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .input-box label {
+            display: block;
+            font-weight: bold;
+            color: #005A9C;
+            margin-bottom: 5px;
+        }
+
+        select, input[type="date"], input[type="time"] {
+            width: 100%;
+            height: 50px;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            border-color: #005A9C;
+            box-shadow: 0 0 5px rgba(0, 90, 156, 0.3);
+        }
+
+        button {
+            width: 100%;
+            height: 55px;
+            background: linear-gradient(135deg, #005A9C, #0072B2);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(-135deg, #0072B2, #005A9C);
+            box-shadow: 0 4px 10px rgba(0, 90, 156, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Doctor Consultation Booking</h1>
+        <form id="doctorBookingForm" method="POST" action="/book-doctor-appointment">
+            <input type="hidden" name="employee_id" value="<%= employee.employee_id %>">
+        
+            <div class="input-box">
+                <label for="clinic">Clinic's near you:</label>
+                <select id="clinic" name="clinic" required>
+                    <option value="" disabled selected>Select a clinic</option>
+                    <option value="Clinic A">Clinic A</option>
+                    <option value="Clinic B">Clinic B</option>
+                    <option value="Clinic C">Clinic C</option>
+                </select>
+            </div>
+        
+            <div class="input-box">
+                <label for="date">Select Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+        
+            <div class="input-box">
+                <label for="time">Select Time:</label>
+                <select id="time" name="time" required>
+                    <option value="" disabled selected>Select a time</option>
+                </select>
+            </div>
+        
+            <button type="submit">Book Appointment</button>
+        </form>
+        
+    </div>
+
+    <script>
+        const dateInput = document.getElementById('date');
+        const timeSelect = document.getElementById('time');
+
+        function populateTimeSlots(date) {
+            const startHour = 9;
+            const endHour = 18;
+            const interval = 30;
+            timeSelect.innerHTML = '<option value="" disabled selected>Select a time</option>';
+
+            const now = new Date();
+            const selectedDate = new Date(date);
+            const isToday = selectedDate.toDateString() === now.toDateString();
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                for (let minute = 0; minute < 60; minute += interval) {
+                    if (hour === endHour && minute > 0) break;
+
+                    const time = new Date();
+                    time.setHours(hour);
+                    time.setMinutes(minute);
+
+                    if (isToday && time < now) continue;
+
+                    const formattedTime = time.toTimeString().slice(0, 5);
+                    const option = document.createElement('option');
+                    option.value = formattedTime;
+                    option.textContent = formattedTime;
+                    timeSelect.appendChild(option);
+                }
+            }
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+        dateInput.addEventListener('change', () => populateTimeSlots(dateInput.value));
+        populateTimeSlots(today);
+    </script>
+</body>
+
+</html>

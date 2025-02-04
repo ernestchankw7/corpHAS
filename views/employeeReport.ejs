@@ -104,10 +104,25 @@
         </button>
         <button id="generate-pdf" class="refresh-button" onclick="generatePDF()">Generate PDF</button>
         
+        <% let bmiValue = null; %>
+
+        <% processedResults.counterResults.forEach(result => { %>
+            <% if (result.testName === "BMI" && result.result.bmi !== undefined) { %>
+                <% bmiValue = result.result.bmi; %>
+            <% } %>
+        <% }); %>
 
         <% if (processedResults.counterResults.length > 0) { %>
         <div class="section">
             <h2>Standard Tests</h2>
+            <% if (bmiValue !== null && (bmiValue > 24.5 || bmiValue < 18.5)) { %>
+                <div style="text-align: center;">
+                    <a href="/bmidoctor/<%= employeeID %>" class="bmilink" style="color: red; font-weight: bold; font-size: 0.9rem;" target="_blank">
+                        Dangerous BMI, Visit a Doctor!
+                    </a>
+                </div>
+            <% } %>
+
             <% processedResults.counterResults.forEach(result => { %>
                 <div class="result-item">
                     <p><strong>Test Name:</strong> <%= result.testName %></p>
