@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +12,7 @@
       padding: 0;
       box-sizing: border-box;
     }
- 
+
     body {
       font-family: Lora, sans-serif;
       display: flex;
@@ -21,7 +21,7 @@
       overflow-x: hidden;
       margin-top: 80px;
     }
- 
+
     /* Main container to hold the catalog grid and sidebar */
     .main-container {
       display: flex;
@@ -30,7 +30,7 @@
       width: 100%;
       padding: 20px;
     }
- 
+
     /* Catalog grid styling */
     .catalog-grid {
       display: grid;
@@ -39,7 +39,7 @@
       width: 100%;
       margin-right: 270px;
     }
- 
+
     /* Catalog item styling */
     .catalog-item {
       background: #fff;
@@ -56,7 +56,7 @@
       flex-direction: column;
       justify-content: space-between;
     }
- 
+
     .catalog-item .content {
       padding: 20px;
       display: flex;
@@ -65,17 +65,17 @@
       /* justify-content: space-between; */
       /* Ensures buttons are aligned */
     }
- 
+
     .catalog-item:hover {
       transform: scale(1.05);
     }
- 
+
     .catalog-item img {
       width: 100%;
       height: 200px;
       object-fit: cover;
     }
- 
+
     .content {
       padding: 20px;
       display: flex;
@@ -83,19 +83,23 @@
       flex-grow: 1;
       /* Ensures content takes available space */
     }
- 
+
     .content h3 {
       font-size: 1.5em;
       margin-bottom: 10px;
       color: #000000;
     }
- 
+
+    .add-button, .view-button, .action-button {
+      font-family: Lora;
+    }
+
     .content p {
       font-size: 1em;
       margin-bottom: 15px;
       color: #000000;
     }
- 
+
     .content button {
       padding: 10px 20px;
       border: none;
@@ -105,7 +109,7 @@
       cursor: pointer;
       font-size: 1em;
     }
- 
+
     /* Sidebar styling */
     .sidebar {
       /* position: sticky; */
@@ -122,7 +126,7 @@
       align-self: start;
       margin-top: 80px;
     }
- 
+
     .sidebar-price {
       /* position: sticky; */
       top: 20px;
@@ -139,7 +143,7 @@
       align-self: start;
       overflow: hidden;
     }
- 
+
     #selected-items {
       max-height: 150px;
       /* Limit height of selected items section */
@@ -149,20 +153,20 @@
       border-top: 1px solid #ddd;
       padding-top: 10px;
     }
- 
+
     .sidebar h3 {
       font-size: 1.5em;
       margin-bottom: 10px;
       color: #000000;
     }
- 
+
     .sidebar p {
       font-size: 1em;
       color: #000000;
       margin-bottom: 10px;
       /* white-space: nowrap; */
     }
- 
+
     /* Modal styling */
     .modal {
       display: none;
@@ -175,7 +179,7 @@
       justify-content: center;
       align-items: center;
     }
- 
+
     .modal-content {
       background: #fff;
       padding: 20px;
@@ -184,16 +188,16 @@
       width: 90%;
       text-align: center;
     }
- 
+
     .modal-content h2 {
       margin-bottom: 15px;
       font-size: 2em;
     }
- 
+
     .modal-content p {
       margin-bottom: 20px;
     }
- 
+
     .close-modal {
       padding: 10px 20px;
       background-color: #0072b2;
@@ -202,30 +206,30 @@
       cursor: pointer;
       font-size: 1em;
     }
- 
+
     /* Responsive styling for smaller screens */
     @media (max-width: 768px) {
       .catalog-grid {
         grid-template-columns: 1fr 1fr;
       }
     }
- 
+
     @media (max-width: 480px) {
       .main-container {
         /* flex-direction: column; */
         /* align-items: center; */
       }
- 
+
       .catalog-grid {
         grid-template-columns: 1fr;
       }
- 
+
       .sidebar {
         width: 100%;
         max-width: 300px;
       }
     }
- 
+
     /* Sidebar container to stack sidebars vertically */
     .sidebar-container {
       display: flex;
@@ -238,16 +242,16 @@
       /* Distance from top of the viewport */
       right: 80px;
       /* Adjust as needed to position it on the right */
- 
+
     }
- 
+
     .price {
       font-weight: bold;
       /* Makes the price stand out */
       font-size: 1.1em;
       /* Slightly increases the font size */
     }
- 
+
     .view-button {
       margin-top: auto;
       /* Pushes the button to the bottom of the content */
@@ -260,7 +264,7 @@
       cursor: pointer;
       font-size: 1em;
     }
- 
+
     .add-button-container {
       display: flex;
       /* Use flexbox for alignment */
@@ -273,7 +277,7 @@
       padding-top: 30px;
       /* Adds some padding between content and Add section */
     }
- 
+
     .proceed-button {
       background-color: #0072b2;
       color: #fff;
@@ -285,7 +289,7 @@
       margin-top: 20px;
       align-self: center;
     }
- 
+
     .selected-item {
       display: flex;
       justify-content: space-between;
@@ -293,7 +297,7 @@
       padding: 5px 0;
       border-bottom: 1px solid #ddd;
     }
- 
+
     .remove-button {
       padding: 5px 10px;
       background-color: #dc3545;
@@ -302,8 +306,8 @@
       border-radius: 4px;
       cursor: pointer;
     }
- 
- 
+
+
     /* Survey Banner Styling */
     #survey-banner {
       background: linear-gradient(to right, #aad9d8, #85d8ce 50%, #aad9d8);
@@ -314,13 +318,13 @@
       top: 65px;
       justify-content: space-between;
     }
- 
+
     /* Link styling inside the banner */
     #survey-link {
       color: rgb(255, 255, 255);
       font-size: 15px;
     }
- 
+
     /* Close button styling */
     #survey-banner button {
       background-color: transparent;
@@ -331,23 +335,23 @@
       vertical-align: middle;
       cursor: pointer;
     }
- 
+
     #survey-link:hover {
       color: #005A9C;
       /* Blue color on hover */
       transform: scale(1.1);
       /* Slight zoom effect */
     }
- 
+
     #survey-banner button:hover {
       transform: scale(1.3);
       /* Enlarge button slightly */
     }
   </style>
- 
+
   <link rel="stylesheet" href="/css/addons.css">
 </head>
- 
+
 <body>
   <%- include('navbar', { employeeID: employeeID, appointment: appointment }) %>
     <div id="survey-banner">
@@ -365,7 +369,7 @@
           <div class="content">
             <h3>Basic Test package</h3>
             <p>These tests included are free of charge.</p>
- 
+
             <div class="add-button-container">
               <button class="view-button" onclick="openModal(1)">
                 View Details
@@ -385,7 +389,7 @@
             <p>
               Evaluates Kidney Function
             </p>
- 
+
             <div class="add-button-container">
               <button class="view-button" onclick="openModal(2)">
                 View Details
@@ -405,7 +409,7 @@
             <p>
               Checks for HIV
             </p>
- 
+
             <div class="add-button-container">
               <button class="view-button" onclick="openModal(3)">
                 View Details
@@ -423,9 +427,9 @@
             <h3>Electrocardiogram</h3>
             <span id="recommended-electro" class="recommended-tag"></span>
             <p>
-              Records heart's electrical activity 
+              Records heart's electrical activity
             </p>
- 
+
             <div class="add-button-container">
               <button class="view-button" onclick="openModal(4)">
                 View Details
@@ -445,7 +449,7 @@
             <p>
               Measures cholesterol levels
             </p>
- 
+
             <div class="add-button-container">
               <button class="view-button" onclick="openModal(5)">
                 View Details
@@ -465,7 +469,7 @@
             <p>
               Detailed body images
             </p>
- 
+
             <div class="add-button-container">
               <button class="view-button" onclick="openModal(6)">
                 View Details
@@ -477,8 +481,8 @@
             </div>
           </div>
         </div>
- 
- 
+
+
       </div>
       <!-- Sidebar for user information -->
       <div class="sidebar-container">
@@ -511,7 +515,7 @@
               <%= employee.package %>
             </p>
           </div>
- 
+
           <!-- Sidebar for price information -->
           <div class="sidebar-price" id="price-info">
             <h3>Price Information</h3>
@@ -524,7 +528,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- Modal popup for each item -->
     <div class="modal" id="modal">
       <div class="modal-content">
@@ -534,168 +538,184 @@
       </div>
     </div>
 
-        <script>
-            const itemDetails = {
-                1: { title: "Basic Test Package", description: "BMI, Blood Pressure test, Eye test, Blood test", price: 0 },
-                2: { title: "Kidney Function Test", description: "Evaluates how well your kidneys are working by measuring levels of waste products and electrolytes in your blood.", price: 99, testId: "T002" },
-                3: { title: "HIV Test", description: "Checks for the presence of the Human Immunodeficiency Virus, which can lead to AIDS if left untreated.", price: 79, testId: "T003" },
-                4: { title: "Electrocardiogram", description: "Records the electrical activity of your heart to check for irregular heartbeats, heart attacks, or other heart conditions.", price: 190, testId: "T004" },
-                5: { title: "Lipid Test", description: "Measures cholesterol and triglyceride levels in your blood, helping assess heart disease risk.", price: 45, testId: "T005" },
-                6: { title: "MRI Scan", description: "An MRI Scan uses strong magnetic fields and radio waves to create detailed images of organs and tissues within your body.", price: 280, testId: "T006" }
-            };
+    <script>
+      const itemDetails = {
+        1: { title: "Basic Test Package", description: "BMI, Blood Pressure test, Eye test, Blood test", price: 0 },
+        2: { title: "Kidney Function Test", description: "Evaluates how well your kidneys are working by measuring levels of waste products and electrolytes in your blood.", price: 99, testId: "T002" },
+        3: { title: "HIV Test", description: "Checks for the presence of the Human Immunodeficiency Virus, which can lead to AIDS if left untreated.", price: 79, testId: "T003" },
+        4: { title: "Electrocardiogram", description: "Records the electrical activity of your heart to check for irregular heartbeats, heart attacks, or other heart conditions.", price: 190, testId: "T004" },
+        5: { title: "Lipid Test", description: "Measures cholesterol and triglyceride levels in your blood, helping assess heart disease risk.", price: 45, testId: "T005" },
+        6: { title: "MRI Scan", description: "An MRI Scan uses strong magnetic fields and radio waves to create detailed images of organs and tissues within your body.", price: 280, testId: "T006" }
+      };
 
-            const cart = {
-                selectedItems: { 1: itemDetails[1] }, // Start with full details for item 1
-                totalPrice: 0,
+      const cart = {
+        selectedItems: { 1: itemDetails[1] }, // Start with full details for item 1
+        totalPrice: 0,
 
-                addItem(itemId) {
-                    if (!this.selectedItems[itemId]) {
-                        this.selectedItems[itemId] = itemDetails[itemId]; // Store full details
-                        this.totalPrice += itemDetails[itemId].price;
-                        this.save();
-                    }
-                },
-            };
+        addItem(itemId) {
+          if (!this.selectedItems[itemId]) {
+            this.selectedItems[itemId] = itemDetails[itemId]; // Store full details
+            this.totalPrice += itemDetails[itemId].price;
+            this.save();
+          }
+        },
+      };
 
-            // Load cart state from localStorage
-            window.onload = function () {
-                const savedCart = JSON.parse(localStorage.getItem('cart'));
-                if (savedCart) {
-                    cart.selectedItems = savedCart.selectedItems;
-                    cart.totalPrice = savedCart.totalPrice;
-                    updatePriceDisplay();
+      // Load cart state from localStorage
+      window.onload = function () {
+        const savedCart = JSON.parse(localStorage.getItem('cart'));
+        if (savedCart) {
+          cart.selectedItems = savedCart.selectedItems;
+          cart.totalPrice = savedCart.totalPrice;
+          updatePriceDisplay();
 
-                    // Disable buttons for already selected items
-                    Object.keys(cart.selectedItems).forEach(id => {
-                        if (document.getElementById(`add-button-${id}`)) {
-                            document.getElementById(`add-button-${id}`).disabled = true;
-                        }
-                    });
-                }
-                // Check if the banner should be displayed
-                if (!localStorage.getItem('hideSurveyBanner')) {
-                    document.getElementById('survey-banner').style.display = 'block';
-                }
-            };
-
-            // Save cart state to localStorage
-            function updateCartStorage() {
-                localStorage.setItem('cart', JSON.stringify(cart));
+          Object.keys(cart.selectedItems).forEach(id => {
+            if (document.getElementById(`add-button-${id}`)) {
+              document.getElementById(`add-button-${id}`).disabled = true;
             }
-
-            //updatePriceDisplay();
-
-            function openModal(item) {
-                document.getElementById('modal-title').textContent = itemDetails[item].title;
-                document.getElementById('modal-description').textContent = itemDetails[item].description;
-                document.getElementById('modal').style.display = 'flex';
+          });
+        }
+        const testItemsRecord = <% - JSON.stringify(testItemsRecord) %>; // Get the test items record from the server-side
+        if (testItemsRecord && testItemsRecord.items) {
+          testItemsRecord.items.forEach(item => {
+            const itemId = Object.keys(itemDetails).find(id => item.title === itemDetails[id].title);
+            if (itemId) {
+              const btn = document.getElementById(`add-button-${itemId}`);
+              //const proceedbtn = document.getElementById('action-button');
+              if (btn) {
+                btn.disabled = true;
+                btn.style.backgroundColor = "grey";  //  Grey out disabled buttons
+                btn.style.cursor = "not-allowed";
+              }
+              // if(proceedbtn) {
+              //   proceedbtn.disabled = true;
+              //   proceedbtn.style.backgroundColor = "grey";
+              //   proceedbtn.style.cursor = "not-allowed";
+              // }
             }
+          });
+        }
+      };
 
-            function closeModal() {
-                document.getElementById('modal').style.display = 'none';
-            }
+      // Save cart state to localStorage
+      function updateCartStorage() {
+        localStorage.setItem('cart', JSON.stringify(cart));
+      }
 
-            function addToCart(itemId) {
-                if (!cart.selectedItems[itemId]) {
-                    //cart.selectedItems[itemId] = true; //ORIGINAL
-                    cart.selectedItems[itemId] = itemDetails[itemId]; // Add the item details
-                    cart.totalPrice += itemDetails[itemId].price;
-                    updateCartStorage(); // Persist state
-                    updatePriceDisplay();
-                    document.getElementById(`add-button-${itemId}`).disabled = true;
-                }
-            }
+      //updatePriceDisplay();
 
-            function removeFromCart(itemId) {
-                if (itemId !== 1 && cart.selectedItems[itemId]) {
-                    delete cart.selectedItems[itemId];
-                    cart.totalPrice -= itemDetails[itemId].price;
-                    updateCartStorage(); // Persist state
-                    updatePriceDisplay();
-                    document.getElementById(`add-button-${itemId}`).disabled = false;
-                }
-            }
+      function openModal(item) {
+        document.getElementById('modal-title').textContent = itemDetails[item].title;
+        document.getElementById('modal-description').textContent = itemDetails[item].description;
+        document.getElementById('modal').style.display = 'flex';
+      }
 
-            function updatePriceDisplay() {
-                const selectedItemsContainer = document.getElementById('selected-items');
-                selectedItemsContainer.innerHTML = `<strong>Selected Items:</strong>`; // Clear current content
+      function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+      }
 
-                Object.keys(cart.selectedItems).forEach(id => {
-                    const item = itemDetails[id];
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'selected-item';
+      function addToCart(itemId) {
+        if (!cart.selectedItems[itemId]) {
+          //cart.selectedItems[itemId] = true; //ORIGINAL
+          cart.selectedItems[itemId] = itemDetails[itemId]; // Add the item details
+          cart.totalPrice += itemDetails[itemId].price;
+          updateCartStorage(); // Persist state
+          updatePriceDisplay();
+          document.getElementById(`add-button-${itemId}`).disabled = true;
+        }
+      }
 
-                    // Only show the "Remove" button for items other than Basic Test Package (item 1)
-                    if (id == 1) {
-                        itemDiv.innerHTML = `<span>${item.title} - $${item.price.toFixed(2)}</span>`;
-                    } else {
-                        itemDiv.innerHTML = `
+      function removeFromCart(itemId) {
+        if (itemId !== 1 && cart.selectedItems[itemId]) {
+          delete cart.selectedItems[itemId];
+          cart.totalPrice -= itemDetails[itemId].price;
+          updateCartStorage(); // Persist state
+          updatePriceDisplay();
+          document.getElementById(`add-button-${itemId}`).disabled = false;
+        }
+      }
+
+      function updatePriceDisplay() {
+        const selectedItemsContainer = document.getElementById('selected-items');
+        selectedItemsContainer.innerHTML = `<strong>Selected Items:</strong>`; // Clear current content
+
+        Object.keys(cart.selectedItems).forEach(id => {
+          const item = itemDetails[id];
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'selected-item';
+
+          // Only show the "Remove" button for items other than Basic Test Package (item 1)
+          if (id == 1) {
+            itemDiv.innerHTML = `<span>${item.title} - $${item.price.toFixed(2)}</span>`;
+          } else {
+            itemDiv.innerHTML = `
                             <span>${item.title} - $${item.price.toFixed(2)}</span>
                             <button class="remove-button" onclick="removeFromCart(${id})">Remove</button>
                         `;
-                    }
+          }
 
-                    selectedItemsContainer.appendChild(itemDiv);
-                });
+          selectedItemsContainer.appendChild(itemDiv);
+        });
 
-                // Update total price display
-                const totalPriceElement = document.getElementById('total-price');
-                totalPriceElement.innerHTML = `<strong>Total Price:</strong> $${cart.totalPrice.toFixed(2)}`;
+        // Update total price display
+        const totalPriceElement = document.getElementById('total-price');
+        totalPriceElement.innerHTML = `<strong>Total Price:</strong> $${cart.totalPrice.toFixed(2)}`;
 
-                // Update action button text to "Pay" if items other than Basic Test Package are selected
-                const actionButton = document.getElementById('action-button');
-                const isOnlyBasicPackage = Object.keys(cart.selectedItems).length === 1 && cart.selectedItems[1];
-                actionButton.textContent = isOnlyBasicPackage ? "Proceed" : "Pay";
-            }
+        // Update action button text to "Pay" if items other than Basic Test Package are selected
+        const actionButton = document.getElementById('action-button');
+        const isOnlyBasicPackage = Object.keys(cart.selectedItems).length === 1 && cart.selectedItems[1];
+        actionButton.textContent = isOnlyBasicPackage ? "Proceed" : "Pay";
+      }
 
-            // window.onload = function () {
-            const recommendedGroups = JSON.parse(localStorage.getItem('recommendedGroups')) || [];
+      // window.onload = function () {
+      const recommendedGroups = JSON.parse(localStorage.getItem('recommendedGroups')) || [];
 
-            // Map group names to element IDs
-            const groupToElementId = {
-                kidney: 'recommended-kidney',
-                hiv: 'recommended-hiv',
-                electro: 'recommended-electro',
-                lipid: 'recommended-lipid',
-                mri: 'recommended-mri',
-            };
+      // Map group names to element IDs
+      const groupToElementId = {
+        kidney: 'recommended-kidney',
+        hiv: 'recommended-hiv',
+        electro: 'recommended-electro',
+        lipid: 'recommended-lipid',
+        mri: 'recommended-mri',
+      };
 
-            // Add "Recommended" labels for matching groups
-            recommendedGroups.forEach(group => {
-                const elementId = groupToElementId[group];
-                if (elementId) {
-                    const element = document.getElementById(elementId);
-                    if (element) {
-                        element.innerText = 'Recommended'; // Add the "Recommended" text
-                        element.style.color = 'red'; // Optional: Add styling for visibility
-                    }
-                }
-            });
+      // Add "Recommended" labels for matching groups
+      recommendedGroups.forEach(group => {
+        const elementId = groupToElementId[group];
+        if (elementId) {
+          const element = document.getElementById(elementId);
+          if (element) {
+            element.innerText = 'Recommended'; // Add the "Recommended" text
+            element.style.color = 'red'; // Optional: Add styling for visibility
+          }
+        }
+      });
 
-            document.getElementById('action-button').addEventListener('click', () => {
-                const employeeID = '<%= employee.employee_id %>';
-                const summary = {
-                    items: Object.values(cart.selectedItems).map(item => ({
-                        title: item.title,
-                        price: item.price
-                    })),
-                    totalPrice: cart.totalPrice
-                };
+      document.getElementById('action-button').addEventListener('click', () => {
+        const employeeID = '<%= employee.employee_id %>';
+        const summary = {
+          items: Object.values(cart.selectedItems).map(item => ({
+            title: item.title,
+            price: item.price
+          })),
+          totalPrice: cart.totalPrice
+        };
 
-                // Save to localStorage
-                localStorage.setItem('cartSummary', JSON.stringify(summary));
+        // Save to localStorage
+        localStorage.setItem('cartSummary', JSON.stringify(summary));
 
-                // Redirect to summary page
-                window.location.href = `/summary/${encodeURIComponent(employeeID)}`;
-            });
+        // Redirect to summary page
+        window.location.href = `/summary/${encodeURIComponent(employeeID)}`;
+      });
 
-            // Close the banner and remember the user's preference
-            document.getElementById('close-banner').addEventListener('click', () => {
-                document.getElementById('survey-banner').style.display = 'none';
-                localStorage.setItem('hideSurveyBanner', 'true'); // Remember the banner is dismissed
-            });
-        </script>
-        <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="7010eacc-7d4f-4ec6-b1b4-fd3a79b69d15";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+      // Close the banner and remember the user's preference
+      document.getElementById('close-banner').addEventListener('click', () => {
+        document.getElementById('survey-banner').style.display = 'none';
+        localStorage.setItem('hideSurveyBanner', 'true'); // Remember the banner is dismissed
+      });
+    </script>
+    <script
+      type="text/javascript">window.$crisp = []; window.CRISP_WEBSITE_ID = "7010eacc-7d4f-4ec6-b1b4-fd3a79b69d15"; (function () { d = document; s = d.createElement("script"); s.src = "https://client.crisp.chat/l.js"; s.async = 1; d.getElementsByTagName("head")[0].appendChild(s); })();</script>
 </body>
 
 </html>

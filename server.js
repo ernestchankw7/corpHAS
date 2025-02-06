@@ -355,9 +355,14 @@ app.get('/add-ons/:employeeID', async (req, res) => {
         // Fetch the latest appointment data
         const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
 
+        // Fetch existing test items
+        const testItemsRecord = await TestItem.findOne({ employee_id: employeeID });
+        console.log("Test Items Record:", testItemsRecord);
+        const existingTestItems = testItemsRecord ? testItemsRecord.items.map(item => item.title) : [];
+
         if (employee) {
-            // Pass both employee and appointment to the template
-            res.render('addOns', { employee, appointment, employeeID });
+            // Pass employee, appointment, and existing test items to the template
+            res.render('addOns', { employee, appointment, employeeID, existingTestItems, testItemsRecord });
         } else {
             res.send("<h1>Employee ID not found.</h1>");
         }
