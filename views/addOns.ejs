@@ -543,7 +543,7 @@
         1: { title: "Basic Test Package", description: "BMI, Blood Pressure test, Eye test, Blood test", price: 0 },
         2: { title: "Kidney Function Test", description: "Evaluates how well your kidneys are working by measuring levels of waste products and electrolytes in your blood.", price: 99, testId: "T002" },
         3: { title: "HIV Test", description: "Checks for the presence of the Human Immunodeficiency Virus, which can lead to AIDS if left untreated.", price: 79, testId: "T003" },
-        4: { title: "Electrocardiogram", description: "Records the electrical activity of your heart to check for irregular heartbeats, heart attacks, or other heart conditions.", price: 190, testId: "T004" },
+        4: { title: "Electrocardiogram Test", description: "Records the electrical activity of your heart to check for irregular heartbeats, heart attacks, or other heart conditions.", price: 190, testId: "T004" },
         5: { title: "Lipid Test", description: "Measures cholesterol and triglyceride levels in your blood, helping assess heart disease risk.", price: 45, testId: "T005" },
         6: { title: "MRI Scan", description: "An MRI Scan uses strong magnetic fields and radio waves to create detailed images of organs and tissues within your body.", price: 280, testId: "T006" }
       };
@@ -575,23 +575,17 @@
             }
           });
         }
-        const testItemsRecord = <% - JSON.stringify(testItemsRecord) %>; // Get the test items record from the server-side
+        const testItemsRecord = <%- JSON.stringify(testItemsRecord) %>; // Get the test items record from the server-side
         if (testItemsRecord && testItemsRecord.items) {
           testItemsRecord.items.forEach(item => {
             const itemId = Object.keys(itemDetails).find(id => item.title === itemDetails[id].title);
             if (itemId) {
               const btn = document.getElementById(`add-button-${itemId}`);
-              //const proceedbtn = document.getElementById('action-button');
               if (btn) {
                 btn.disabled = true;
                 btn.style.backgroundColor = "grey";  //  Grey out disabled buttons
                 btn.style.cursor = "not-allowed";
               }
-              // if(proceedbtn) {
-              //   proceedbtn.disabled = true;
-              //   proceedbtn.style.backgroundColor = "grey";
-              //   proceedbtn.style.cursor = "not-allowed";
-              // }
             }
           });
         }
