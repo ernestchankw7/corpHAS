@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
- 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +11,7 @@
             margin: 0;
             padding: 20px;
         }
- 
+
         .summary-container {
             max-width: 600px;
             margin: 0 auto;
@@ -21,31 +20,27 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
- 
+
         .summary-title {
             font-size: 1.5em;
             margin-bottom: 20px;
             text-align: center;
         }
- 
+
         .item-row {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid #ddd;
         }
- 
-        .item-row:last-child {
-            border-bottom: none;
-        }
- 
+
         .total-row {
             margin-top: 20px;
             font-size: 1.2em;
             font-weight: bold;
         }
- 
-        .back-button {
+
+        .button {
             margin-top: 20px;
             display: block;
             text-align: center;
@@ -54,151 +49,116 @@
             color: white;
             text-decoration: none;
             border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 50px;
         }
- 
+
+        .hidden {
+            display: none;
+        }
+
         #paypal-container-X3HPGWDCVPBK2 {
             margin-top: 30px;
             text-align: center;
         }
- 
-        .paypal-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
     </style>
 </head>
- 
+
 <body>
     <div class="summary-container">
         <h1 class="summary-title">Order Summary</h1>
-        <p><strong>Name:</strong>
-            <%= employee.name %>
-        </p>
-        <p><strong>Employee ID:</strong>
-            <%= employee.employee_id %>
-        </p>
-        <p><strong>Email:</strong>
-            <%= employee.email %>
-        </p>
-        <p><strong>Phone:</strong>
-            <%= employee.phone %>
-        </p>
-        <p><strong>Company:</strong>
-            <%= employee.company %>
-        </p>
-        <p><strong>Package:</strong>
-            <%= employee.package %>
-        </p>
- 
+        <p><strong>Name:</strong> <%= employee.name %></p>
+        <p><strong>Employee ID:</strong> <%= employee.employee_id %></p>
+        <p><strong>Email:</strong> <%= employee.email %></p>
+        <p><strong>Phone:</strong> <%= employee.phone %></p>
+        <p><strong>Company:</strong> <%= employee.company %></p>
+        <p><strong>Package:</strong> <%= employee.package %></p>
+
         <div id="cart-summary"></div>
- 
-        <div id="paypal-button-container"></div>
- 
-        <a href="/add-ons/<%= employee.employee_id %>" class="back-button">Back</a>
+
+        <a href="/add-ons/<%= employee.employee_id %>" class="button">Back</a>
+        <button id="confirm-button" class="button hidden" style="width: 100%; border: none; height: 42px;">Confirm and Proceed</button>
+        <div id="paypal-button-container" class="hidden"></div>
     </div>
- 
-    <!-- PayPal SDK -->
-    <script
-        src="https://www.paypal.com/sdk/js?client-id=AQ3UjkyxHHlfjOdVDILyH7lJwauWKNgfaUaTTmZnnZt2dgDAJoSP28d8Y76YyOIzCbiJ62M_ITC8a1X3&currency=SGD&disable-funding=venmo"></script>
- 
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AQ3UjkyxHHlfjOdVDILyH7lJwauWKNgfaUaTTmZnnZt2dgDAJoSP28d8Y76YyOIzCbiJ62M_ITC8a1X3&currency=SGD&disable-funding=venmo"></script>
+
     <script>
-        // Retrieve cartSummary from localStorage
         const cartSummary = JSON.parse(localStorage.getItem("cartSummary"));
- 
-        console.log("Cart Summary:", cartSummary);
- 
-        // Check if cartSummary exists
         const summaryContainer = document.getElementById("cart-summary");
+        const confirmButton = document.getElementById("confirm-button");
+        const paypalContainer = document.getElementById("paypal-button-container");
+
         if (cartSummary && cartSummary.items && cartSummary.items.length > 0) {
-            summaryContainer.innerHTML = ""; // Clear loading message
- 
-            // Display each item
             cartSummary.items.forEach((item) => {
-                if (item && item.title) {
-                    const itemRow = document.createElement("div");
-                    itemRow.className = "item-row";
- 
-                    // Create title span
-                    const titleSpan = document.createElement("span");
-                    titleSpan.textContent = item.title;
- 
-                    // Create price span
-                    const priceSpan = document.createElement("span");
-                    priceSpan.textContent = `$${item.price.toFixed(2)}`;
- 
-                    // Append spans to itemRow
-                    itemRow.appendChild(titleSpan);
-                    itemRow.appendChild(priceSpan);
-                    summaryContainer.appendChild(itemRow);
-                }
+                const itemRow = document.createElement("div");
+                itemRow.className = "item-row";
+                itemRow.innerHTML = `<span>${item.title}</span><span>$${item.price.toFixed(2)}</span>`;
+                summaryContainer.appendChild(itemRow);
             });
- 
-            // Display total price
+
             const totalRow = document.createElement("div");
             totalRow.className = "total-row";
- 
-            const totalLabel = document.createElement("strong");
-            totalLabel.textContent = "Total:";
- 
-            const totalValue = document.createTextNode(` $${cartSummary.totalPrice.toFixed(2)}`);
- 
-            totalRow.appendChild(totalLabel);
-            totalRow.appendChild(totalValue);
+            totalRow.innerHTML = `<strong>Total:</strong> $${cartSummary.totalPrice.toFixed(2)}`;
             summaryContainer.appendChild(totalRow);
- 
-            // Render PayPal button if total price > $0
-            if (cartSummary.totalPrice > 0) {
+
+            if (cartSummary.totalPrice === 0) {
+                // Show the "Confirm and Proceed" button for Basic Test Package only
+                confirmButton.classList.remove("hidden");
+            } else {
+                // Show PayPal button for items with additional costs
+                paypalContainer.classList.remove("hidden");
                 paypal.Buttons({
                     createOrder: function (data, actions) {
                         return actions.order.create({
-                            purchase_units: [{
-                                amount: {
-                                    value: cartSummary.totalPrice.toFixed(2)
-                                }
-                            }]
+                            purchase_units: [{ amount: { value: cartSummary.totalPrice.toFixed(2) } }]
                         });
                     },
                     onApprove: function (data, actions) {
                         return actions.order.capture().then(function (details) {
-                            handlePaymentSuccess(details, cartSummary);  // Send payment data to the backend
+                            handlePaymentSuccess(details, cartSummary);
                         });
                     }
                 }).render("#paypal-button-container");
-            } else {
-                const paypalContainer = document.getElementById("paypal-container-X3HPGWDCVPBK2");
-                paypalContainer.innerHTML = "<p>Payment not required for Basic Test Package.</p>";
             }
         } else {
             summaryContainer.innerHTML = "<p>No items in the cart.</p>";
         }
- 
-        // This is an example of sending data to your server after a successful payment
-        function handlePaymentSuccess(details, cartSummary) {
-            console.log("Payment success details:", details);
-            console.log("APPROVED!")
+
+        confirmButton.addEventListener("click", () => {
             const employeeID = '<%= employee.employee_id %>';
-            // Call API to save items
-            fetch("https://obscure-plateau-48204-0c5bc03f33b6.herokuapp.com/test-items/save/"+employeeID,
-            {
+            fetch(`/test-items/save/${employeeID}`, {
                 method: "POST",
-                body: JSON
-                .stringify
-                ({
-                details: details,
-                cartSummary: cartSummary,
-                }),
-                headers: {
-                "Content-type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ details: {}, cartSummary })
             })
-                .then((response) => response.json())
-                .then((json) => console.log(json));
-            // Redirect back to add-ons page
-            localStorage.removeItem('cart');
-            window.location.href = `/add-ons/${employeeID}`;
+            .then((response) => {
+                if (response.ok) {
+                    alert("Basic Test Package saved successfully!");
+                    localStorage.removeItem("cart");
+                    window.location.href = `/add-ons/${employeeID}`;
+                } else {
+                    alert("Error saving Basic Test Package.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred while saving the package.");
+            });
+        });
+
+        function handlePaymentSuccess(details, cartSummary) {
+            const employeeID = '<%= employee.employee_id %>';
+            fetch(`/test-items/save/${employeeID}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ details, cartSummary })
+            })
+            .then(() => {
+                localStorage.removeItem("cart");
+                window.location.href = `/add-ons/${employeeID}`;
+            });
         }
     </script>
 </body>
- 
 </html>
