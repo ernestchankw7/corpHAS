@@ -149,8 +149,41 @@ app.post('/update-employee/:employee_id', async (req, res) => {
 
         if (updatedEmployee) {
             res.send(`
-                <h1>Employee details updated successfully!</h1>
-                <a href="/check-employee-profile/${updatedEmployee.employee_id}">Back to Profile Page</a>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>No Available Slots</title>
+                <style>
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        font-family: 'Lora', serif;
+                        background-color: #aad9d8;
+                        text-align: center;
+                    }
+                    h1 {
+                        color: #005A9C;
+                        font-size: 2rem;
+                        margin-bottom: 20px;
+                    }
+                    a {
+                        text-decoration: none;
+                        color: black;
+                        font-size: 1rem;
+                    }
+                </style>
+                </head>
+                <body>
+                    <h1>Employee details updated successfully!</h1>
+                    <a href="/check-employee-profile/${updatedEmployee.employee_id}"><u>Back to home</u></a>
+                </body>
+                </html>
             `);
         } else {
             res.send("<h1>Employee ID not found. No updates made.</h1>");
@@ -232,7 +265,43 @@ app.post('/book-appointment', async (req, res) => {
  
         // Check if the slot is already full
         if (appointment.currentPatients >= appointment.maxPatients) {
-            return res.status(400).send("<h1>No available slots for this appointment.</h1>");
+            return res.status(400).send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>No Available Slots</title>
+                <style>
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        font-family: 'Lora', serif;
+                        background-color: #aad9d8;
+                        text-align: center;
+                    }
+                    h1 {
+                        color: red;
+                        font-size: 2rem;
+                        margin-bottom: 20px;
+                    }
+                    a {
+                        text-decoration: none;
+                        color: black;
+                        font-size: 1rem;
+                    }
+                </style>
+                </head>
+                <body>
+                    <h1>No available slots for this appointment.</h1>
+                    <a href="/booking-form/${employee_id}"><u>Back to book appointment</u></a>
+                </body>
+                </html>
+            `);
         }
  
         const patientAppointment = new PatientAppointmentBooking({
@@ -467,7 +536,43 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
  
         // Check if there are available slots in the new time slot
         if (newTimeSlot.currentPatients >= newTimeSlot.maxPatients) {
-            return res.status(400).send("<h1>No available slots for the selected appointment.</h1>");
+            return res.status(400).send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>No Available Slots</title>
+                <style>
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        font-family: 'Lora', serif;
+                        background-color: #aad9d8;
+                        text-align: center;
+                    }
+                    h1 {
+                        color: red;
+                        font-size: 2rem;
+                        margin-bottom: 20px;
+                    }
+                    a {
+                        text-decoration: none;
+                        color: black;
+                        font-size: 1rem;
+                    }
+                </style>
+                </head>
+                <body>
+                    <h1>No available slots for this appointment.</h1>
+                    <a href="/reschedule-appointment/${employee_id}"><u>Back to reschedule appointment</u></a>
+                </body>
+                </html>
+            `);
         }
  
         newTimeSlot.currentPatients += 1;
