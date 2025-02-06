@@ -3,12 +3,20 @@ const mongoose = require('mongoose')
 const path = require('path')
 const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
+const { Dropbox } = require('dropbox');
+const fetch = require('node-fetch');
 const fs = require('fs');
 //const port = 2000
 const port = process.env.PORT || 2000;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
+
+const dbx = new Dropbox({
+    accessToken: 'sl.u.AFgBIxj-iLK4CQfUrj672SXDW0PH4Cc4ahmIoitZjemvsoIHSFrP5fQEZAs-P7titJ4ZasT6UWAO5GIxyW9D5ccv94QlMp2bnxEO2j9k0xUtp5UYAGuRZFTLVz9PitoPn3Yteere3gO6xrnxCdkL6wZv7YZJ139U4vxddKF4g6Y_CBuuH6jiToee4P6S0HG7NGcBiLd7q14Rn4dvOwlJhIsE6j9pEm2h73secyh39ICACFjqWXJXKV4KgNQZKYekahfcwT5JlnXF_ITvH8P4mKqRL_NMFtR27BD1ACUQDx4kjf8nJNE9HxF1Wie6Z2oG1gkANjsn9NIm475GJCTjosMcbN9avBjoqDQ6Nh4G8kl7itUsNJuIlHdnDE1GTXfkwja3LYhUbGxoAgs2NclftxpFF3y-wV8aTObhlMZN4mqgHkzu54ksVXCfcXEQPn37ds-aFLF8Afj5eytGINFQmzdCUg-DkPSRem4NOkF4z5qhLFlHL-8_HpxKWIaX1EbZPKXPxqTuOCWofYVq3D4sYOmfA_4ZMt3iFVDYpeVx-pz3wk0V0E2cGjtRrgEkKuRdyH4l4fvystu8_UIydNiBXI79Omhl5rw38mzH3fk6h4Glw3itAkJ2woVLxgdTog45KiUKf9mgdQnpBaS6GAzfWG4Vf98JixLMKKPz8ZbppRGHADePHV-xbtd0muGs9XheOc-nCpkkp4943swZsG5TNqv0JE8VyqPtCjX0IleF9kTveiVGWpNQsvuSh0bARATOROJP3glUsi3TiEl6nHRH1juqRTjAUhV3bZiq_VOkIIHljAJz5Oe38a06WmRl8JelVZM3SJfFYGiyEKYyH5k_YiCFKkDeoQDdHi1Skz5YW5tMcf1VY4llCkGYjSgHXmNwe8TVJc9QmfdBhQPR4EKizxaDr1n1_xKW5noiO71yQ64wEBfX5N9POP3bNmnyhc13KDCfHGqUdAySe2z2TDDhT3Khjwxs8R7_rHR149hzKIItBQAkUjsVmu194r9Kx8HTW-ZkAm2r2AwA9X4d4_H2tV7wIX8ZfQ210HVrvPfwiY85zoOPaWaYdeBK69kKdlS7FKxy-9mD2Zsij56n4xdZgkoqjdMqQzJ5WYC46ZFKanG375_9q1eTj-C5mULZTB5p6vSHjIgKgbZg2cUK938TNka83T93iJjVIHeq0sYyMNv7-9bEwRDn9yxF2L7_TbK-JNkKcfC0rJJLvA-wxjlWi0BGJtdMVVMGIUI9Gedgq9v1KD9NjM5qG257yWLaZJ0xXZs',
+    fetch: fetch
+});
+
 
 var bodyParser = require('body-parser');
  
@@ -913,6 +921,60 @@ app.post('/book-doctor-appointment', async (req, res) => {
     } catch (error) {
         console.error("Error:", error.stack);
         res.status(500).send(`Server error while booking doctor appointment: ${error.message}`);
+    }
+});
+
+app.post('/store-in-dropbox/:employeeID', async (req, res) => {
+    const { employeeID } = req.params;
+
+    try {
+        // Fetch employee details
+        const employee = await Employee.findOne({ employee_id: employeeID });
+        if (!employee) {
+            return res.status(404).send('Employee not found.');
+        }
+
+        // Generate PDF in memory
+        const doc = new PDFDocument();
+        const buffers = [];
+
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', async () => {
+            const pdfBuffer = Buffer.concat(buffers);
+            // const dropboxPath = `/Reports/${employee.email}_TestReport.pdf`;
+            const dropboxPath = `/EmployeeReports/${employee.email}_TestReport.pdf`;
+
+            try {
+                // Upload to Dropbox
+                await dbx.filesUpload({
+                    path: dropboxPath,
+                    contents: pdfBuffer,
+                    mode: 'overwrite'
+                });
+
+                console.log(`Report stored in Dropbox: ${dropboxPath}`);
+                res.status(200).send('Report stored in Dropbox.');
+            } catch (dropboxError) {
+                console.error('Error uploading to Dropbox:', dropboxError);
+                res.status(500).send('Error uploading to Dropbox.');
+            }
+        });
+
+        // Write PDF content
+        doc.fontSize(16).text('Employee Test Report', { align: 'center' });
+        doc.fontSize(12).moveDown();
+        doc.text(`Employee ID: ${employee.employee_id}`);
+        doc.text(`Name: ${employee.name}`);
+        doc.text(`Email: ${employee.email}`);
+        doc.text(`Phone: ${employee.phone}`);
+        doc.text(`Company: ${employee.company}`);
+        doc.text(`Package: ${employee.package}`);
+        doc.moveDown();
+        doc.end(); // Finalize PDF document
+
+    } catch (error) {
+        console.error('Error generating/storing PDF:', error);
+        res.status(500).send('Server error while storing report.');
     }
 });
 

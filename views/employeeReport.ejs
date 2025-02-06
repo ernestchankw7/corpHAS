@@ -103,6 +103,10 @@
             Refresh Report
         </button>
         <button id="generate-pdf" class="refresh-button" onclick="generatePDF()">Generate PDF</button>
+        <button id="store-in-dropbox" class="refresh-button" onclick="storeInDropbox()">
+            Store in Dropbox
+        </button>
+
         
         <% let bmiValue = null; %>
 
@@ -176,6 +180,23 @@
                 alert('Failed to generate PDF. Please try again.');
             }
         }
+        async function storeInDropbox() {
+        try {
+            const response = await fetch(`/store-in-dropbox/<%= employeeID %>`, {
+                method: 'POST',
+            });
+
+            if (response.ok) {
+                alert('Report successfully stored in Dropbox!');
+            } else {
+                alert('Failed to store the report in Dropbox.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error storing the report in Dropbox.');
+        }
+        }
+        
     </script>
 </body>
 
