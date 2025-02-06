@@ -13,7 +13,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }))
 
 const dbx = new Dropbox({
-    accessToken: 'sl.u.AFgBIxj-iLK4CQfUrj672SXDW0PH4Cc4ahmIoitZjemvsoIHSFrP5fQEZAs-P7titJ4ZasT6UWAO5GIxyW9D5ccv94QlMp2bnxEO2j9k0xUtp5UYAGuRZFTLVz9PitoPn3Yteere3gO6xrnxCdkL6wZv7YZJ139U4vxddKF4g6Y_CBuuH6jiToee4P6S0HG7NGcBiLd7q14Rn4dvOwlJhIsE6j9pEm2h73secyh39ICACFjqWXJXKV4KgNQZKYekahfcwT5JlnXF_ITvH8P4mKqRL_NMFtR27BD1ACUQDx4kjf8nJNE9HxF1Wie6Z2oG1gkANjsn9NIm475GJCTjosMcbN9avBjoqDQ6Nh4G8kl7itUsNJuIlHdnDE1GTXfkwja3LYhUbGxoAgs2NclftxpFF3y-wV8aTObhlMZN4mqgHkzu54ksVXCfcXEQPn37ds-aFLF8Afj5eytGINFQmzdCUg-DkPSRem4NOkF4z5qhLFlHL-8_HpxKWIaX1EbZPKXPxqTuOCWofYVq3D4sYOmfA_4ZMt3iFVDYpeVx-pz3wk0V0E2cGjtRrgEkKuRdyH4l4fvystu8_UIydNiBXI79Omhl5rw38mzH3fk6h4Glw3itAkJ2woVLxgdTog45KiUKf9mgdQnpBaS6GAzfWG4Vf98JixLMKKPz8ZbppRGHADePHV-xbtd0muGs9XheOc-nCpkkp4943swZsG5TNqv0JE8VyqPtCjX0IleF9kTveiVGWpNQsvuSh0bARATOROJP3glUsi3TiEl6nHRH1juqRTjAUhV3bZiq_VOkIIHljAJz5Oe38a06WmRl8JelVZM3SJfFYGiyEKYyH5k_YiCFKkDeoQDdHi1Skz5YW5tMcf1VY4llCkGYjSgHXmNwe8TVJc9QmfdBhQPR4EKizxaDr1n1_xKW5noiO71yQ64wEBfX5N9POP3bNmnyhc13KDCfHGqUdAySe2z2TDDhT3Khjwxs8R7_rHR149hzKIItBQAkUjsVmu194r9Kx8HTW-ZkAm2r2AwA9X4d4_H2tV7wIX8ZfQ210HVrvPfwiY85zoOPaWaYdeBK69kKdlS7FKxy-9mD2Zsij56n4xdZgkoqjdMqQzJ5WYC46ZFKanG375_9q1eTj-C5mULZTB5p6vSHjIgKgbZg2cUK938TNka83T93iJjVIHeq0sYyMNv7-9bEwRDn9yxF2L7_TbK-JNkKcfC0rJJLvA-wxjlWi0BGJtdMVVMGIUI9Gedgq9v1KD9NjM5qG257yWLaZJ0xXZs',
+    accessToken: 'sl.u.AFgVsNLtpSUJBeKqKKEB-ngsYz5v5tpJOnLCd3KQ7XqYdDK1WTDjboGD52CX_R1oZquDS6uNsVbBrXl5wYxPZQF-BOMGIrAuoVFcqL9ktmPR2cOR4QMjq_kqr3g__ZisbNknTiiolsTZEO79hiiynMpG7o8TT_1a5hOo2NtR80IX10JPl4L6RzMjkeuq_NAYShvkOoXIHhJqJalSVNfi4KfZZSY_JOhDm3ds6tq38u_886l190JoJWdK0ijxtacFOqUVlsYiIZr8TICzk8WWSC9ka6ksjdSk8caoLLL1Q4EG0a4XgAYXflPlRlq0DSVSE56Ky5u_sZ9CkkAI03JHXlp3V7S3I9SeHSP4557DZca6i5cafB1Ms0NuwkCSHHRm4tL8gME9nbh3Fj-zzdQMFvvFmYkNjKOakVDNh_AVppxT2T7J-TemHs_dk4qHovUVpjkIiGAMXkaiTrUg3l9a79u1dr_O6KTDCxco_I6K-NYUiNCinWe4neiCM2Ro_s9UXREiDastIAs0w7ehH_CJHdJ6tNxo4B5CxHXVHDGqH_g61EBV9hYaVSONY21PXGvY9DiLFrodSPDUjjBKvrK0-KLarVHpwMSkO34S1RbRSC6hi0-4wYsALhp4pE7-fkglE7fwjnph1UxD9P5bNRXsJVbZFTuNe4jtqVnXok8TA9yIb3IV27Bch3d6Ea7OtAcQ_gzUoEeG9BhByTdxzMT_FiVJ7pZv07rZ9jyMVP0pN-PQeOOo3ntltSaBQ3Cg6lQn7a4siA2-LIMX0Nc-t5CLkt5ErmFpTAbK1MZedbuPftyvz78f77YJXHv2W_aZ-bLjckzIq_NPQF6BAyNDtttmeRiiPJ4DGrjfm39fYCVcqkfzawGcIDPEFy87EA88GbezRbmm4D0OLe8WRq4WObWaMr0uYE4LzvlrehHugGfkqOX6BO9WDhzauYFCosVBQ-a9ZRuBPGRr3AYbcZd3xZxF14vKPWgsIYMseP2p-cl89UMq2qn_8TQ7I7pFY82MVOTzKH8d0QCVDNGVd__MYBbt1Hni-uGDnaPoPEhb-lgt6e8ZmGbXEn_Hy3NZjmrMJab1JhfgV9tO2CifvUc2mOL65Urki5VwOUjnc5l5RA9mVCbUjbh2NKK3aP6x2gPgJhvOFlAOh8TUEEIUUxDAZoPVf-ZwIVdPV81qZvhET3zIKJMY6-3Rnyb7m6vR4Bb-XI_ndHO87FCgfrlv2oQY_HWmrJzHDr44i3ZWTmRPcO6IKgKZPklp0yCyP3r0aCB9xvjnfao',
     fetch: fetch
 });
 
@@ -700,115 +700,6 @@ app.get('/employee-report/:employeeID', async (req, res) => {
     }
 });
 
-// Route to generate PDF dynamically
-app.post('/generate-pdf/:employeeID', async (req, res) => {
-    const { employeeID } = req.params;
-
-    try {
-        // Fetch the required data
-        const employee = await Employee.findOne({ employee_id: employeeID });
-        const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
-        const testResult = await TestResult.findOne({ employeeId: employeeID });
-
-        // Process results
-        const processedResults = {
-            counterResults: [],
-            addOnCounters: [],
-        };
-
-        if (testResult) {
-            if (testResult.counterResults) {
-                for (const [counter, details] of Object.entries(testResult.counterResults)) {
-                    processedResults.counterResults.push({
-                        testName: details.testName,
-                        result: details.result || 'Pending Result',
-                    });
-                }
-            }
-
-            if (testResult.addOnCounters) {
-                testResult.addOnCounters.forEach(counter => {
-                    const { testName, tests } = counter;
-                    const results = tests.map(test => ({
-                        testName: test.testName || 'Subtest Name',
-                        result: test.result || 'Pending Result',
-                    }));
-
-                    processedResults.addOnCounters.push({
-                        testName,
-                        results,
-                    });
-                });
-            }
-        }
-
-        // Create a new PDF document
-        const doc = new PDFDocument();
-        const filename = `Employee_TestResult_Report_${employeeID}.pdf`;
-
-        // Set headers for file download
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-
-        // Pipe the PDF to the response
-        doc.pipe(res);
-
-        // Add PDF content
-        doc.fontSize(16).text('Employee Test Report', { align: 'center' });
-        doc.fontSize(12).moveDown();
-        doc.text(`Employee ID: ${employee.employee_id}`);
-        doc.text(`Name: ${employee.name}`);
-        doc.text(`Email: ${employee.email}`);
-        doc.text(`Phone: ${employee.phone}`);
-        doc.text(`Company: ${employee.company}`);
-        doc.text(`Package: ${employee.package}`);
-        doc.moveDown();
-
-        if (appointment) {
-            doc.text(`Last Appointment: ${appointment.date.toDateString()} at ${appointment.time}`);
-        } else {
-            doc.text('No appointment details available.');
-        }
-
-        doc.moveDown().text('Test Results:', { underline: true });
-        if (processedResults.counterResults.length > 0) {
-            processedResults.counterResults.forEach(result => {
-                doc.moveDown().text(`Test Name: ${result.testName}`);
-                Object.entries(result.result).forEach(([key, value]) => {
-                    doc.text(`${key}: ${value}`);
-                });
-            });
-        } else {
-            doc.text('No Standard Test Results Available.');
-        }
-
-        if (processedResults.addOnCounters.length > 0) {
-            doc.moveDown().text('Additional Tests:', { underline: true });
-            processedResults.addOnCounters.forEach(counter => {
-                doc.moveDown().text(`Test Name: ${counter.testName}`);
-                
-                if (counter.results.length > 0) {
-                    counter.results.forEach(test => {
-                        const resultValue = (test.result === null || test.result === undefined || test.result === "") 
-                            ? "null" 
-                            : test.result;
-                        doc.text(`${test.testName}: ${resultValue}`);
-                    });
-                } else {
-                    doc.text("Result: null"); // Ensures "null" is displayed when there are no results
-                }
-            });
-        } else {
-            doc.text('No Additional Test Results Available.');
-        }
-
-        // End the PDF document
-        doc.end();
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        res.status(500).send('Server error while generating PDF.');
-    }
-});
 
 // Handle saving the test items
 app.post('/test-items/save/:employee_id', async (req, res) => {
@@ -924,32 +815,169 @@ app.post('/book-doctor-appointment', async (req, res) => {
     }
 });
 
+//pdf-generation 
+const createPDF = (doc, employee, appointment, processedResults) => {
+    // Add PDF content
+    doc.fontSize(16).text('Employee Test Report', { align: 'center' });
+    doc.fontSize(12).moveDown();
+    doc.text(`Employee ID: ${employee.employee_id}`);
+    doc.text(`Name: ${employee.name}`);
+    doc.text(`Email: ${employee.email}`);
+    doc.text(`Phone: ${employee.phone}`);
+    doc.text(`Company: ${employee.company}`);
+    doc.text(`Package: ${employee.package}`);
+    doc.moveDown();
+
+    if (appointment) {
+        doc.text(`Last Appointment: ${appointment.date.toDateString()} at ${appointment.time}`);
+    } else {
+        doc.text('No appointment details available.');
+    }
+
+    doc.moveDown().text('Test Results:', { underline: true });
+
+    // Add counter results
+    if (processedResults.counterResults.length > 0) {
+        processedResults.counterResults.forEach(result => {
+            doc.moveDown().text(`Test Name: ${result.testName}`);
+            Object.entries(result.result).forEach(([key, value]) => {
+                const resultValue = value ? value : "Pending Result"; // Fallback for empty or null values
+                doc.text(`${key}: ${resultValue}`);
+            });
+        });
+    } else {
+        doc.text('No Standard Test Results Available.');
+    }
+
+    // Add add-on counters
+    if (processedResults.addOnCounters.length > 0) {
+        doc.moveDown().text('Additional Tests:', { underline: true });
+        processedResults.addOnCounters.forEach(counter => {
+            doc.moveDown().text(`Test Name: ${counter.testName}`);
+            if (counter.results.length > 0) {
+                counter.results.forEach(test => {
+                    const resultValue = test.result ? test.result : "Pending Result"; // Fallback for empty or null values
+                    doc.text(`${test.testName}: ${resultValue}`);
+                });
+            } else {
+                doc.text("Pending Result");
+            }
+        });
+    } else {
+        doc.text('No Additional Test Results Available.');
+    }
+};
+app.post('/generate-pdf/:employeeID', async (req, res) => {
+    const { employeeID } = req.params;
+
+    try {
+        const employee = await Employee.findOne({ employee_id: employeeID });
+        const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
+        const testResult = await TestResult.findOne({ employeeId: employeeID });
+
+        const processedResults = {
+            counterResults: [],
+            addOnCounters: [],
+        };
+
+        if (testResult) {
+            if (testResult.counterResults) {
+                for (const [counter, details] of Object.entries(testResult.counterResults)) {
+                    processedResults.counterResults.push({
+                        testName: details.testName,
+                        result: details.result || 'Pending Result',
+                    });
+                }
+            }
+
+            if (testResult.addOnCounters) {
+                testResult.addOnCounters.forEach(counter => {
+                    const { testName, tests } = counter;
+                    const results = tests.map(test => ({
+                        testName: test.testName || 'Subtest Name',
+                        result: test.result || 'Pending Result',
+                    }));
+
+                    processedResults.addOnCounters.push({
+                        testName,
+                        results,
+                    });
+                });
+            }
+        }
+
+        const doc = new PDFDocument();
+        const filename = `Employee_TestResult_Report_${employeeID}.pdf`;
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+        doc.pipe(res);
+
+        createPDF(doc, employee, appointment, processedResults);
+        doc.end(); // Finalize PDF document
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).send('Server error while generating PDF.');
+    }
+});
 app.post('/store-in-dropbox/:employeeID', async (req, res) => {
     const { employeeID } = req.params;
 
     try {
-        // Fetch employee details
         const employee = await Employee.findOne({ employee_id: employeeID });
         if (!employee) {
             return res.status(404).send('Employee not found.');
         }
 
-        // Generate PDF in memory
+        const appointment = await PatientAppointmentBooking.findOne({ employee_id: employeeID }).sort({ date: -1, time: -1 });
+        const testResult = await TestResult.findOne({ employeeId: employeeID });
+
+        const processedResults = {
+            counterResults: [],
+            addOnCounters: [],
+        };
+
+        if (testResult) {
+            if (testResult.counterResults) {
+                for (const [counter, details] of Object.entries(testResult.counterResults)) {
+                    processedResults.counterResults.push({
+                        testName: details.testName,
+                        result: details.result || 'Pending Result',
+                    });
+                }
+            }
+
+            if (testResult.addOnCounters) {
+                testResult.addOnCounters.forEach(counter => {
+                    const { testName, tests } = counter;
+                    const results = tests.map(test => ({
+                        testName: test.testName || 'Subtest Name',
+                        result: test.result || 'Pending Result',
+                    }));
+
+                    processedResults.addOnCounters.push({
+                        testName,
+                        results,
+                    });
+                });
+            }
+        }
+
         const doc = new PDFDocument();
         const buffers = [];
 
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', async () => {
             const pdfBuffer = Buffer.concat(buffers);
-            // const dropboxPath = `/Reports/${employee.email}_TestReport.pdf`;
             const dropboxPath = `/EmployeeReports/${employee.email}_TestReport.pdf`;
 
             try {
-                // Upload to Dropbox
                 await dbx.filesUpload({
                     path: dropboxPath,
                     contents: pdfBuffer,
-                    mode: 'overwrite'
+                    mode: 'overwrite',
                 });
 
                 console.log(`Report stored in Dropbox: ${dropboxPath}`);
@@ -960,16 +988,7 @@ app.post('/store-in-dropbox/:employeeID', async (req, res) => {
             }
         });
 
-        // Write PDF content
-        doc.fontSize(16).text('Employee Test Report', { align: 'center' });
-        doc.fontSize(12).moveDown();
-        doc.text(`Employee ID: ${employee.employee_id}`);
-        doc.text(`Name: ${employee.name}`);
-        doc.text(`Email: ${employee.email}`);
-        doc.text(`Phone: ${employee.phone}`);
-        doc.text(`Company: ${employee.company}`);
-        doc.text(`Package: ${employee.package}`);
-        doc.moveDown();
+        createPDF(doc, employee, appointment, processedResults);
         doc.end(); // Finalize PDF document
 
     } catch (error) {

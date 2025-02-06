@@ -121,9 +121,10 @@
             <h2>Standard Tests</h2>
             <% if (bmiValue !== null && (bmiValue > 24.5 || bmiValue < 18.5)) { %>
                 <div style="text-align: center;">
-                    <a href="/bmidoctor/<%= employeeID %>" class="bmilink" style="color: red; font-weight: bold; font-size: 0.9rem;" target="_blank">
-                        Dangerous BMI, Visit a Doctor!
-                    </a>
+                    <span style="color: red; font-weight: bold; font-size: 0.9rem;">Dangerous BMI !</span>
+                    <button class="refresh-button" style="margin-left: 10px; padding: 6px; font-size: 0.8rem" onclick="window.open('/bmidoctor/<%= employeeID %>', '_blank')">
+                        Visit a Doctor
+                    </button>
                 </div>
             <% } %>
 
