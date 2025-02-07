@@ -810,39 +810,75 @@ app.get('/employee-report/:employeeID', async (req, res) => {
 app.post('/test-items/save/:employee_id', async (req, res) => {
     const { employee_id } = req.params;
     const { details, cartSummary } = req.body;
-    const items = cartSummary.items; // Directly use the items from cartSummary
+ 
+    // Ensure cartSummary exists and has items
+    const items = cartSummary?.items || [];
+ 
+    if (items.length === 0) {
+        return res.status(400).send('No items provided in the request.');
+    }
  
     try {
-        // Log the incoming data for debugging
         console.log('Employee ID from URL:', employee_id);
-        console.log('CartSummary:', cartSummary);
+        console.log('Received Items:', items);
  
-        // Check if a record already exists for this employee_id
         const existingRecord = await TestItem.findOne({ employee_id });
  
         if (existingRecord) {
-            // Filter out duplicate items
             const existingItemSet = new Set(existingRecord.items.map(item => JSON.stringify(item)));
             const uniqueNewItems = items.filter(item => !existingItemSet.has(JSON.stringify(item)));
  
             if (uniqueNewItems.length > 0) {
-                existingRecord.items.push(...uniqueNewItems); // Append only unique items
+                existingRecord.items.push(...uniqueNewItems);
                 await existingRecord.save();
                 console.log(`Updated items for employee_id: ${employee_id}`);
             } else {
                 console.log(`No new unique items to add for employee_id: ${employee_id}`);
             }
         } else {
-            // If no record exists, create a new one
             const testItem = new TestItem({
                 employee_id,
-                items,
+                items, // Store the items properly
             });
             await testItem.save();
             console.log(`Created new record for employee_id: ${employee_id}`);
         }
  
-        // Return a 200 response to mark success
+        // Find the employee's email
+        const employee = await Employee.findOne({ employee_id });
+ 
+        if (employee) {
+            // Set up nodemailer transporter
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'corphassg@gmail.com',
+                    pass: 'jtaq jhof vvro eldm', // Store this securely!
+                },
+            });
+ 
+            // Format email content
+            const mailOptions = {
+                from: 'corphassg@gmail.com',
+                to: employee.email,
+                subject: 'Test Items Confirmation',
+                html: `
+                    <h1>Test Items Confirmation</h1>
+                    <p>Dear ${employee.name},</p>
+                    <p>Your test items have been successfully purchased.</p>
+                    <h3>Test:</h3>
+                    <ul>
+                        ${items.map(item => `<li>${item.title} - $${item.price}</li>`).join('')}
+                    </ul>
+                    <p>Thank you for using our service.</p>
+                `,
+            };
+ 
+            // Send the email
+            await transporter.sendMail(mailOptions);
+            console.log(`Confirmation email sent to ${employee.email}`);
+        }
+ 
         res.sendStatus(200);
     } catch (error) {
         console.error('Error:', error.stack);
