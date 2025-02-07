@@ -199,6 +199,78 @@
         dateInput.min = today;
         dateInput.addEventListener('change', () => populateTimeSlots(dateInput.value));
         populateTimeSlots(today);
+
+        // Clinics data (replace with API or database fetch in production)
+        const clinics = [
+            { name: "Central 24-HR Clinic(Woodlands)", lat: 1.4481570675780482, lng: 103.79871396379644 },
+            { name: "NorthLink (Woodlands) Clinic", lat: 1.4358078464591948, lng: 103.78839164914092 },
+            { name: "Central 24-HR Clinic(Marsiling)", lat: 1.4321102385520434, lng: 103.773685097115 },
+            { name: "EH Medical Familiy Clinic(Woodlands)", lat: 1.4472116712325054, lng: 103.8060432667359 },
+            { name: "Woodlands Health Campus", lat: 1.425639818812272, lng: 103.7942489265061 },
+            { name: "Peace Familiy Clinic", lat: 1.4329012429289043, lng: 103.78670453967196 },
+            { name: "Martin Medical Centre(Woodlands)", lat: 1.4387358972464066, lng: 103.78237009042647 },
+            { name: "Woodlands Familiy Clinic", lat: 1.4309339329573079, lng: 103.77594227991301 },
+            { name: "Tan & Nah Familiy Clinic", lat: 1.4462875309967964, lng: 103.8006539722416 },
+            { name: "My Familiy Clinic", lat: 1.4457007883285367, lng: 103.79833847694073 },
+            { name: "Parkway Shenton Medical Clinic, Woodlands MRT", lat: 1.4376809953781735, lng: 103.78845018461077 },
+        ];
+
+        const clinicSelect = document.getElementById('clinic');
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of Earth in kilometers
+            const dLat = ((lat2 - lat1) * Math.PI) / 180;
+            const dLon = ((lon2 - lon1) * Math.PI) / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function updateClinicOptions() {
+            // Check if Geolocation API is available
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+
+            // Get user's location
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    // Calculate distances to clinics
+                    const distances = clinics.map(clinic => ({
+                        ...clinic,
+                        distance: getDistance(userLat, userLng, clinic.lat, clinic.lng),
+                    }));
+
+                    // Sort by distance and take the 3 closest clinics
+                    const nearestClinics = distances.sort((a, b) => a.distance - b.distance).slice(0, 3);
+
+                    // Update the select options
+                    clinicSelect.innerHTML = '<option value="" disabled selected>Select a clinic</option>';
+                    nearestClinics.forEach(clinic => {
+                        const option = document.createElement('option');
+                        option.value = clinic.name;
+                        option.textContent = `${clinic.name} (${clinic.distance.toFixed(2)} km)`;
+                        clinicSelect.appendChild(option);
+                    });
+                },
+                (error) => {
+                    console.error("Error fetching location:", error);
+                    alert("Unable to fetch your location. Please enable location access.");
+                }
+            );
+        }
+
+        // Call this on page load
+        updateClinicOptions();
     </script>
     <script
     type="text/javascript">window.$crisp = []; window.CRISP_WEBSITE_ID = "7010eacc-7d4f-4ec6-b1b4-fd3a79b69d15"; (function () { d = document; s = d.createElement("script"); s.src = "https://client.crisp.chat/l.js"; s.async = 1; d.getElementsByTagName("head")[0].appendChild(s); })();</script>
