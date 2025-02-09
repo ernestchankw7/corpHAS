@@ -101,7 +101,43 @@ app.post('/check-employee', async (req, res) => {
             //res.render('employeeDetails', { employee });
             res.redirect(`/check-employee-profile/${employee_id}`);
         } else {
-            res.send("<h1>Employee ID not found. Please try again.</h1>");
+            return res.status(400).send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>No Available Slots</title>
+                <style>
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        font-family: 'Lora', serif;
+                        background-color: #aad9d8;
+                        text-align: center;
+                    }
+                    h1 {
+                        color: red;
+                        font-size: 2rem;
+                        margin-bottom: 20px;
+                    }
+                    a {
+                        text-decoration: none;
+                        color: black;
+                        font-size: 1rem;
+                    }
+                </style>
+                </head>
+                <body>
+                    <h1>Invalid employee ID</h1>
+                    <a href="/"><u>Try again</u></a>
+                </body>
+                </html>
+            `);
         }
     } catch (error) {
         res.status(500).send("Server error");
