@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
 const { Dropbox } = require('dropbox');
 const fetch = require('node-fetch');
+const cron = require('node-cron');
 const fs = require('fs');
 //const port = 2000
 const port = process.env.PORT || 2000;
@@ -496,12 +497,10 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
     const { date, time, reason, specialRequests } = req.body;
  
     try {
-        // Log the employee_id to ensure it's being passed correctly
         console.log('Employee ID from URL:', employee_id);
  
-        // Fetch the current appointment for the employee
+        // Fetch the current appointment
         const currentAppointment = await PatientAppointmentBooking.findOne({ employee_id });
- 
         if (!currentAppointment) {
             console.log('Appointment not found for employee:', employee_id);
             return res.status(404).send("Appointment not found");
@@ -515,27 +514,26 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
             specialRequests: currentAppointment.specialRequests || "None"
         };
  
-        // Decrease currentPatients count for the previous time slot
-        let oldTimeSlot = await Appointment.findOne({ date: currentAppointment.date, time: currentAppointment.time });
-        if (oldTimeSlot) {
-            oldTimeSlot.currentPatients = Math.max(0, oldTimeSlot.currentPatients - 1);
-            await oldTimeSlot.save();
+        // Helper function to convert dates
+        function toLocalYMD(dateObj) {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
  
-        // Check if the new time slot exists and create/update it accordingly
-        let newTimeSlot = await Appointment.findOne({ date, time });
-        if (!newTimeSlot) {
-            const defaultMaxPatients = 5;
-            newTimeSlot = new Appointment({
-                date,
-                time,
-                maxPatients: defaultMaxPatients,
-                currentPatients: 0
-            });
-        }
+        const oldDateObj = new Date(currentAppointment.date);
+        const oldDateStr = toLocalYMD(oldDateObj);
+        const newDateObj = new Date(date);
+        const newDateStr = toLocalYMD(newDateObj);
  
-        // Check if there are available slots in the new time slot
-        if (newTimeSlot.currentPatients >= newTimeSlot.maxPatients) {
+        const oldTimeStr = currentAppointment.time;
+        const newTimeStr = time;
+ 
+        if (oldDateStr === newDateStr && oldTimeStr === newTimeStr) {
+            // return res
+            //   .status(400)
+            //   .send("<h1>You have selected the same date and time as your current appointment. No changes made.</h1>");
             return res.status(400).send(`
                 <!DOCTYPE html>
                 <html lang="en">
@@ -568,18 +566,86 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                 </style>
                 </head>
                 <body>
-                    <h1>No available slots for this appointment.</h1>
+                    <h1>You have selected the same date and time as your current appointment. No changes made</h1>
                     <a href="/reschedule-appointment/${employee_id}"><u>Back to reschedule appointment</u></a>
                 </body>
                 </html>
             `);
         }
  
-        newTimeSlot.currentPatients += 1;
-        await newTimeSlot.save();
+        const oldSlot = await Appointment.findOne({
+            date: oldDateStr,
+            time: oldTimeStr
+        });
  
-        // Send email when the new time slot becomes full
-        if (newTimeSlot.currentPatients === newTimeSlot.maxPatients) {
+        // --------------------------------------------------
+        // 4) INCREMENT THE NEW SLOT'S currentPatients
+        // --------------------------------------------------
+        let newSlot = await Appointment.findOne({
+            date: newDateStr,
+            time: newTimeStr
+        });
+ 
+        if (!newSlot) {
+            newSlot = new Appointment({
+                date: newDateStr,
+                time: newTimeStr,
+                maxPatients: 5,
+                currentPatients: 0
+            });
+        }
+ 
+        if (newSlot.currentPatients >= newSlot.maxPatients) {
+            //return res.status(400).send("<h1>No available slots for the selected appointment.</h1>");
+            return res.status(400).send(`
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>No Available Slots</title>
+                                <style>
+                                    body {
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                        align-items: center;
+                                        height: 100vh;
+                                        margin: 0;
+                                        font-family: 'Lora', serif;
+                                        background-color: #aad9d8;
+                                        text-align: center;
+                                    }
+                                    h1 {
+                                        color: red;
+                                        font-size: 2rem;
+                                        margin-bottom: 20px;
+                                    }
+                                    a {
+                                        text-decoration: none;
+                                        color: black;
+                                        font-size: 1rem;
+                                    }
+                                </style>
+                                </head>
+                                <body>
+                                    <h1>No available slots for this appointment.</h1>
+                                    <a href="/reschedule-appointment/${employee_id}"><u>Back to reschedule appointment</u></a>
+                                </body>
+                                </html>
+                            `);
+        }
+ 
+        // Decrement the old slot's currentPatients only if the reschedule succeeds
+        if (oldSlot) {
+            oldSlot.currentPatients = Math.max(0, oldSlot.currentPatients - 1);
+            await oldSlot.save();
+        }
+ 
+        newSlot.currentPatients += 1;
+        await newSlot.save();
+ 
+        if (newSlot.currentPatients === newSlot.maxPatients) {
             const mailOptions = {
                 from: 'corphassg@gmail.com',
                 to: 'parkwaypantaisg@gmail.com',
@@ -589,9 +655,9 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                     <p>Dear Admin,</p>
                     <p>The following appointment slot has reached its maximum capacity:</p>
                     <ul>
-                        <li>Date: ${new Date(date).toDateString()}</li>
+                        <li>Date: ${newDateObj.toDateString()}</li>
                         <li>Time: ${time}</li>
-                        <li>Current Patient Count: ${newTimeSlot.maxPatients}</li>
+                        <li>Current Patient Count: ${newSlot.maxPatients}</li>
                     </ul>
                     <p>Please make the necessary arrangements. Thank you!</p>
                 `,
@@ -602,14 +668,12 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                 .catch(error => console.error('Error sending email:', error));
         }
  
-        // Update the appointment with new details
         currentAppointment.date = date;
         currentAppointment.time = time;
         currentAppointment.reason = reason;
         currentAppointment.specialRequests = specialRequests;
         await currentAppointment.save();
  
-        // Send updated confirmation email with previous and new details
         const employee = await Employee.findOne({ employee_id: currentAppointment.employee_id });
         if (employee) {
             const transporter = nodemailer.createTransport({
@@ -630,14 +694,14 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
                     <p>Your appointment has been successfully rescheduled!</p>
                     <p><strong>Previous Appointment Details:</strong></p>
                     <ul>
-                        <li>Date: ${new Date(previousAppointment.date).toDateString()}</li>
+                        <li>Date: ${previousAppointment.date.toDateString()}</li>
                         <li>Time: ${previousAppointment.time}</li>
                         <li>Reason: ${previousAppointment.reason}</li>
                         <li>Special Requests: ${previousAppointment.specialRequests}</li>
                     </ul>
                     <p><strong>New Appointment Details:</strong></p>
                     <ul>
-                        <li>Date: ${new Date(date).toDateString()}</li>
+                        <li>Date: ${newDateObj.toDateString()}</li>
                         <li>Time: ${time}</li>
                         <li>Reason: ${reason}</li>
                         <li>Special Requests: ${specialRequests || 'None'}</li>
@@ -649,7 +713,6 @@ app.post('/reschedule-appointment/:employee_id', async (req, res) => {
             await transporter.sendMail(mailOptions);
         }
  
-        // Send response confirming the reschedule
         res.send(`
             <!DOCTYPE html>
             <html lang="en">
@@ -1135,6 +1198,50 @@ app.post('/store-in-dropbox/:employeeID', async (req, res) => {
     } catch (error) {
         console.error('Error generating/storing PDF:', error);
         res.status(500).send('Server error while storing report.');
+    }
+});
+
+// Email Reminder 1 Hour Before Appointment
+cron.schedule('* * * * *', async () => {
+    console.log('Running email reminder job to check for appointments one hour in advance.');
+ 
+    try {
+        const now = new Date();
+        const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // Add 1 hour
+ 
+        // Format the date and time for matching appointments
+        const targetDate = oneHourLater.toISOString().split('T')[0];
+        const targetTime = `${String(oneHourLater.getHours()).padStart(2, '0')}:${String(oneHourLater.getMinutes()).padStart(2, '0')}`;
+ 
+        // Fetch appointments one hour later from the current time
+        const appointments = await PatientAppointmentBooking.find({ date: targetDate, time: targetTime });
+ 
+        for (const appointment of appointments) {
+            const employee = await Employee.findOne({ employee_id: appointment.employee_id });
+ 
+            if (employee) {
+                const mailOptions = {
+                    from: 'corphassg@gmail.com',
+                    to: employee.email,
+                    subject: 'Appointment Reminder',
+                    html: `
+                        <h1>Your Appointment Reminder</h1>
+                        <p>Dear ${employee.name},</p>
+                        <p>This is a reminder for your appointment scheduled for:</p>
+                        <ul>
+                            <li>Date: ${new Date(appointment.date).toDateString()}</li>
+                            <li>Time: ${appointment.time}</li>
+                        </ul>
+                        <p>Please ensure your availability. Thank you!</p>
+                    `,
+                };
+ 
+                await transporter.sendMail(mailOptions);
+                console.log(`Reminder email sent to: ${employee.email}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error sending reminder emails:', error);
     }
 });
 
